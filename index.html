@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1b3c77">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Relevé Égout — DEA 93</title>
+<style>
+:root{
+  --bdk:#1b3c77;--bmd:#2a5299;--blt:#e2efff;
+  --amb:#e8a820;--alt:#fffce8;
+  --red:#c0392b;--rlt:#ffecec;
+  --grn:#1e7e34;--glt:#eaf7ec;
+  --plt:#f1ebff;--bg:#f2f5fb;--card:#fff;
+  --border:#c5d5e8;--text:#1a1a2e;--muted:#6c757d;
+  --r:8px;--sh:0 2px 10px rgba(0,0,0,.11);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  background:var(--bg);color:var(--text);font-size:15px;-webkit-tap-highlight-color:transparent;}
+#topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--bdk);color:#fff;
+  padding:8px 14px 7px;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+#topbar h1{font-size:15px;font-weight:700;}
+#topbar .sub{font-size:10.5px;opacity:.72;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tb-r{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+#sbadge{background:rgba(255,255,255,.2);border-radius:20px;padding:2px 9px;font-size:11.5px;font-weight:700;}
+.sdot{width:9px;height:9px;border-radius:50%;background:#4caf50;display:inline-block;transition:background .3s;}
+.sdot.err{background:#e53935;box-shadow:0 0 6px #e53935;}
+#tabs{position:fixed;top:57px;left:0;right:0;z-index:99;background:var(--bmd);
+  display:flex;border-bottom:2px solid var(--bdk);}
+.tab{flex:1;padding:10px 2px;border:none;background:none;color:rgba(255,255,255,.65);
+  font-size:11.5px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;
+  transition:all .2s;white-space:nowrap;}
+.tab.on{color:#fff;border-bottom-color:#fff;background:rgba(255,255,255,.1);}
+#content{margin-top:103px;padding:12px 12px 88px;}
+.panel{display:none;}.panel.on{display:block;}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);
+  padding:12px 14px;margin-bottom:10px;border:1px solid var(--border);}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--bmd);
+  letter-spacing:.3px;margin-bottom:9px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.fg{display:grid;gap:8px;margin-bottom:8px;}.fg.c2{grid-template-columns:1fr 1fr;}
+.fld label{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;
+  color:var(--bdk);letter-spacing:.2px;margin-bottom:4px;}
+.fld input,.fld select,.fld textarea{width:100%;padding:10px 11px;border:1.5px solid var(--border);
+  border-radius:6px;font-size:15px;font-family:inherit;background:#fff;color:var(--text);
+  -webkit-appearance:none;appearance:none;transition:border-color .2s;}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--bmd);
+  box-shadow:0 0 0 3px rgba(42,82,153,.13);}
+.fld textarea{resize:vertical;min-height:66px;}
+.fld select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23777' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+/* ATLAS */
+.upload-zone{border:2.5px dashed var(--border);border-radius:12px;padding:32px 20px;
+  text-align:center;background:#f8fbff;cursor:pointer;transition:all .2s;margin-bottom:10px;}
+.upload-zone:active,.upload-zone.over{border-color:var(--bmd);background:var(--blt);}
+.uz-icon{font-size:44px;margin-bottom:10px;}
+.api-note{background:#fff8e1;border:1px solid #ffca28;border-radius:6px;
+  padding:10px 13px;font-size:12px;color:#6d4c00;line-height:1.5;margin-bottom:10px;}
+.step{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px;font-size:13px;line-height:1.5;}
+.step .n{background:var(--bdk);color:#fff;border-radius:50%;width:22px;height:22px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+#prompt-box{width:100%;font-family:monospace;font-size:11px;line-height:1.45;padding:9px;
+  border:1px solid var(--border);border-radius:6px;background:#fafbff;color:#444;
+  min-height:110px;resize:vertical;}
+/* TABLE VALIDATION */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px;border:1px solid var(--border);}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{background:var(--bdk);color:#fff;padding:7px 8px;text-align:left;white-space:nowrap;font-size:11px;}
+.tbl td{padding:5px 7px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.tbl tr:nth-child(even) td{background:#f8fbff;}
+.tbl input{width:100%;padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-size:12px;font-family:inherit;min-width:55px;}
+.tbl select{width:100%;padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-size:12px;font-family:inherit;-webkit-appearance:none;}
+/* TRONÇON CARDS */
+.trc-card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);
+  padding:12px 14px;margin-bottom:8px;border:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;cursor:pointer;}
+.trc-card.act{border-color:var(--bmd);border-width:2px;background:var(--blt);}
+.trc-num{background:var(--bdk);color:#fff;border-radius:6px;padding:7px 10px;
+  font-size:14px;font-weight:700;min-width:44px;text-align:center;flex-shrink:0;line-height:1;}
+.trc-num small{display:block;font-size:9px;opacity:.7;font-weight:400;margin-top:1px;}
+.trc-body{flex:1;min-width:0;}
+.trc-rue{font-weight:700;font-size:14px;color:var(--bdk);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.trc-info{font-size:12px;color:var(--muted);margin-top:2px;}
+.trc-r{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.status{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.s-p{background:#eef2ff;color:#3949ab;}.s-i{background:var(--alt);color:#7a5c00;}.s-d{background:var(--glt);color:var(--grn);}
+/* VISITE HEADER */
+.vhd{background:var(--bdk);color:#fff;border-radius:var(--r);padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh);}
+.vhd .tid{font-size:12px;opacity:.75;}
+.vhd .tname{font-size:16px;font-weight:700;margin:2px 0 6px;}
+.vhd .dets{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.vhd .det{background:rgba(255,255,255,.15);border-radius:4px;padding:2px 8px;font-size:11px;}
+.vnav{display:flex;gap:8px;}
+.vnavbtn{flex:1;padding:9px;border:1.5px solid rgba(255,255,255,.4);border-radius:6px;
+  background:rgba(255,255,255,.1);color:#fff;font-size:13px;font-weight:600;cursor:pointer;}
+.vnavbtn:disabled{opacity:.35;cursor:default;}
+.donebtn{background:var(--grn);border-color:var(--grn);flex:2;}
+/* ZONE BUTTONS */
+.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:5px;}
+.zb{padding:12px 6px;border:2px solid transparent;border-radius:8px;font-size:13px;
+  font-weight:700;cursor:pointer;text-align:center;line-height:1.3;transition:all .18s;}
+.zb.vg,.zb.vd{background:var(--blt);border-color:#4a8fd9;color:#0b2f72;}
+.zb.pg,.zb.pd{background:var(--alt);border-color:var(--amb);color:#68490a;}
+.zb.rad{background:var(--rlt);border-color:var(--red);color:#690000;}
+.zb.equip{background:var(--glt);border-color:#27ae60;color:#14511f;}
+.zb.rues{background:var(--plt);border-color:#8e44ad;color:#3a0078;}
+.zb.ON{filter:brightness(.85);box-shadow:inset 0 0 0 2px rgba(0,0,0,.25);transform:scale(.97);}
+.zb.vg.ON,.zb.vd.ON{background:#4a8fd9;color:#fff;}
+.zb.pg.ON,.zb.pd.ON{background:var(--amb);color:#fff;}
+.zb.rad.ON{background:var(--red);color:#fff;}
+.zb.equip.ON{background:#27ae60;color:#fff;}
+.zb.rues.ON{background:#8e44ad;color:#fff;}
+/* CODES */
+.cat-lbl{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;
+  color:var(--bdk);background:var(--blt);border-radius:4px;padding:3px 8px;margin:8px 0 4px;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;}
+.chip{padding:6px 9px;border:1.5px solid var(--border);border-radius:18px;font-size:11.5px;
+  cursor:pointer;background:#fff;font-family:inherit;display:flex;flex-direction:column;transition:all .15s;}
+.chip .cid{font-weight:700;font-size:12px;color:var(--bmd);}
+.chip .cdesc{font-size:10px;color:var(--muted);line-height:1.2;}
+.chip.B{border-left:3px solid var(--red);}.chip.C{border-left:3px solid #27ae60;}
+.chip.ON{background:var(--bmd);border-color:var(--bdk);border-left-color:var(--bdk);}
+.chip.ON .cid,.chip.ON .cdesc{color:#fff;}
+#codes-box{max-height:240px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:#fafbff;}
+#code-search{width:100%;padding:10px 10px 10px 34px;border:1.5px solid var(--border);
+  border-radius:6px;font-size:15px;font-family:inherit;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 9px center;
+  margin-bottom:6px;}
+/* SEV */
+.sev-row{display:flex;gap:7px;margin-top:5px;}
+.sb{flex:1;padding:10px 4px;border:2px solid transparent;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;}
+.sb.s1{background:#e8f5e9;border-color:#81c784;color:#1b5e20;}
+.sb.s2{background:#fff8e1;border-color:#ffca28;color:#6d4c00;}
+.sb.s3{background:#fff3e0;border-color:#ff7043;color:#7f1500;}
+.sb.s4{background:#ffebee;border-color:#e53935;color:#4a0000;}
+.sb.s1.ON{background:#43a047;color:#fff;border-color:#1b5e20;}
+.sb.s2.ON{background:#ffa000;color:#fff;border-color:#6d4c00;}
+.sb.s3.ON{background:#e64a19;color:#fff;border-color:#7f1500;}
+.sb.s4.ON{background:#c62828;color:#fff;border-color:#4a0000;}
+/* CLOCK */
+.clock-wrap{display:flex;align-items:center;gap:14px;margin-top:6px;}
+.clock-btns{display:grid;grid-template-columns:1fr 1fr;gap:5px;flex:1;}
+.cb{padding:9px 4px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;background:#fff;transition:all .15s;}
+.cb.ON{background:var(--bmd);border-color:var(--bdk);color:#fff;}
+/* TOGGLE (équipements) */
+.toggle2{display:flex;gap:6px;margin-top:2px;}
+.tgl{flex:1;padding:10px 4px;border:1.5px solid var(--border);border-radius:6px;font-size:12.5px;
+  font-weight:700;cursor:pointer;text-align:center;background:#fff;font-family:inherit;transition:all .15s;}
+.tgl.ON{background:#27ae60;border-color:#14511f;color:#fff;}
+/* GPS */
+.gps-row{display:flex;gap:8px;align-items:center;margin-top:5px;}
+.gps-btn{padding:11px 14px;border:1.5px solid var(--bmd);border-radius:8px;background:var(--blt);
+  color:var(--bdk);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;}
+#gps-info{font-size:12px;color:var(--muted);flex:1;line-height:1.4;}
+#gps-clear{background:none;border:none;color:#bbb;font-size:20px;cursor:pointer;display:none;}
+/* OBS */
+.obs-item{background:var(--card);border-radius:var(--r);padding:11px 13px;margin-bottom:8px;
+  border:1px solid var(--border);box-shadow:var(--sh);display:flex;align-items:flex-start;gap:11px;cursor:pointer;}
+.obs-dist{background:var(--bdk);color:#fff;border-radius:6px;padding:7px 10px;font-size:13px;
+  font-weight:700;min-width:52px;text-align:center;flex-shrink:0;line-height:1;}
+.obs-dist small{display:block;font-size:10px;opacity:.7;font-weight:400;margin-top:1px;}
+.obs-body{flex:1;min-width:0;}
+.obs-code{font-weight:700;font-size:15px;color:var(--bdk);display:flex;flex-wrap:wrap;align-items:center;gap:4px;}
+.badge{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:14px;font-weight:600;}
+.obs-desc{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.3;}
+.obs-note{font-size:12px;color:#999;margin-top:3px;font-style:italic;}
+.del-btn{background:none;border:none;color:#ccc;font-size:22px;cursor:pointer;padding:0 2px;flex-shrink:0;align-self:center;}
+.bvg,.bvd{background:var(--blt);color:#0b2f72;}.bpg,.bpd{background:var(--alt);color:#68490a;}
+.brad{background:var(--rlt);color:#690000;}.bequip{background:var(--glt);color:#14511f;}.brues{background:var(--plt);color:#3a0078;}
+/* PHOTOS */
+.photo-btns{display:flex;gap:8px;margin-top:6px;}
+.photo-btn{flex:1;padding:14px 8px;border:2px dashed var(--border);border-radius:8px;background:#f8fbff;
+  font-size:13px;font-weight:700;cursor:pointer;text-align:center;color:var(--bmd);font-family:inherit;
+  transition:all .18s;line-height:1.4;}
+.photo-btn:active{background:var(--blt);border-color:var(--bmd);}
+.photo-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.photo-thumb{position:relative;width:80px;height:80px;border-radius:7px;overflow:hidden;border:2px solid var(--border);flex-shrink:0;}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block;}
+.photo-del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.62);color:#fff;border:none;
+  border-radius:50%;width:22px;height:22px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.photo-note{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.5;}
+.obs-photos{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;align-items:center;}
+.obs-photo-thumb{width:50px;height:50px;border-radius:5px;object-fit:cover;border:1.5px solid var(--border);cursor:pointer;}
+.photo-badge{display:inline-flex;align-items:center;gap:3px;background:var(--blt);color:var(--bdk);font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;}
+/* LIGHTBOX */
+#lightbox{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.93);
+  flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;}
+#lightbox.on{display:flex;}
+#lb-img{max-width:96vw;max-height:78vh;border-radius:10px;object-fit:contain;}
+#lb-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.18);border:none;
+  color:#fff;width:44px;height:44px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+#lb-nav{display:flex;gap:16px;align-items:center;}
+#lb-prev,#lb-next{background:rgba(255,255,255,.15);border:none;color:#fff;width:44px;height:44px;
+  border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+#lb-caption{color:rgba(255,255,255,.72);font-size:13px;text-align:center;}
+/* MISC */
+.sh{font-size:12.5px;font-weight:700;text-transform:uppercase;color:var(--bmd);letter-spacing:.3px;margin:14px 0 6px;}
+.sh:first-child{margin-top:0;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.btn{padding:13px 20px;border-radius:8px;border:none;font-size:15px;font-weight:700;cursor:pointer;
+  font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
+.btn:active{opacity:.85;}
+.btn-p{background:var(--bdk);color:#fff;flex:1;}
+.btn-s{background:#eee;color:var(--text);}
+.empty{text-align:center;padding:44px 20px;color:var(--muted);}
+.empty .ico{font-size:46px;margin-bottom:10px;}
+.empty h3{font-size:16px;margin-bottom:7px;color:var(--text);}
+.empty p{font-size:13.5px;line-height:1.55;}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.stat-row:last-child{border:none;}
+.stat-val{font-weight:700;font-size:18px;color:var(--bdk);}
+.exp-btn{width:100%;padding:13px;border-radius:8px;border:1.5px solid var(--bmd);background:var(--blt);
+  color:var(--bdk);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;}
+.exp-btn.danger{border-color:var(--red);background:var(--rlt);color:var(--red);}
+.exp-btn.success{border-color:var(--grn);background:var(--glt);color:var(--grn);}
+#fab{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:200;
+  background:var(--bdk);color:#fff;border:none;border-radius:30px;padding:14px 30px;
+  font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(27,60,119,.48);
+  display:none;align-items:center;gap:8px;}
+#fab:active{transform:translateX(-50%) scale(.96);}
+/* MODAL */
+#overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.52);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#overlay.on{display:flex;flex-direction:column;}
+#modal{background:#fff;border-radius:16px 16px 0 0;margin-top:auto;max-height:93vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.m-head{background:var(--bdk);color:#fff;padding:14px 16px;border-radius:16px 16px 0 0;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.m-head h2{font-size:17px;}
+.m-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.m-body{padding:16px;padding-bottom:90px;}
+.m-foot{padding:12px 16px;border-top:1px solid var(--border);background:#f8fbff;display:flex;gap:9px;position:sticky;bottom:0;}
+#toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(18px);
+  background:#222;color:#fff;padding:10px 22px;border-radius:28px;font-size:14px;
+  z-index:600;opacity:0;transition:all .28s;pointer-events:none;white-space:nowrap;max-width:94vw;overflow:hidden;text-overflow:ellipsis;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* RAPPORT IMPRIMABLE */
+#report{display:none;}
+@media print{
+  body{background:#fff;font-size:11px;}
+  #topbar,#tabs,#fab,#overlay,#trc-overlay,#lightbox,#loading,#toast,#content,.no-print{display:none!important;}
+  #report{display:block!important;}
+}
+#report h1{font-size:18px;color:#1b3c77;margin-bottom:2px;}
+#report .rpt-meta-doc{font-size:11px;color:#555;margin-bottom:14px;border-bottom:2px solid #1b3c77;padding-bottom:6px;}
+.rpt-trc{page-break-after:always;margin-bottom:20px;}
+.rpt-trc:last-child{page-break-after:auto;}
+.rpt-trc h2{font-size:14px;background:#1b3c77;color:#fff;padding:6px 10px;border-radius:4px;margin-bottom:8px;}
+.rpt-fiche{width:100%;border-collapse:collapse;font-size:10.5px;margin-bottom:10px;}
+.rpt-fiche td{border:1px solid #bbb;padding:4px 7px;}
+.rpt-fiche td.k{background:#eef3fa;font-weight:700;color:#1b3c77;white-space:nowrap;width:1%;}
+.rpt-obs{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:8px;}
+.rpt-obs th{background:#2a5299;color:#fff;padding:4px 6px;text-align:left;border:1px solid #1b3c77;}
+.rpt-obs td{border:1px solid #bbb;padding:3px 6px;vertical-align:top;}
+.rpt-obs tr:nth-child(even) td{background:#f6f9fd;}
+.rpt-photos{margin:6px 0 12px;}
+.rpt-photos .cap{font-size:10px;font-weight:700;color:#1b3c77;margin:6px 0 3px;}
+.rpt-photos img{width:44mm;height:33mm;object-fit:cover;border:1px solid #999;margin:0 4px 4px 0;break-inside:avoid;}
+.rpt-empty{font-size:11px;color:#888;font-style:italic;margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="flex:1;min-width:0;">
+      <h1>📋 Relevé Égout Visitable — DEA 93</h1>
+      <div class="sub" id="top-sub">Aucune session — charger un JSON ou créer des tronçons</div>
+    </div>
+    <div class="tb-r"><span id="sbadge">0/0</span><span class="sdot" id="save-dot" title="État de la sauvegarde"></span></div>
+  </div>
+</div>
+
+<div id="tabs">
+  <button class="tab on"  onclick="goTab('atlas',this)">📄 Atlas</button>
+  <button class="tab"     onclick="goTab('troncons',this)">🗂️ Tronçons</button>
+  <button class="tab"     onclick="goTab('visite',this)">🔍 Visite</button>
+  <button class="tab"     onclick="goTab('export',this)">📤 Export</button>
+</div>
+
+<div id="content">
+
+  <!-- ATLAS -->
+  <div class="panel on" id="panel-atlas">
+    <div class="card">
+      <div class="card-title">📄 Analyser l'atlas PDF avec Claude (avec internet, avant le terrain)</div>
+      <div class="step"><span class="n">1</span><span>Ouvrez <strong>claude.ai</strong> (ou l'app Claude) et joignez le PDF de l'atlas linéaire dans le chat.</span></div>
+      <div class="step"><span class="n">2</span><span>Collez le prompt ci-dessous et envoyez. Claude renvoie un bloc JSON.</span></div>
+      <div class="step"><span class="n">3</span><span>Enregistrez la réponse dans un fichier <strong>.json</strong> (ou copiez-la dans un fichier texte renommé en .json), puis chargez-le ci-dessous. Vous pourrez vérifier et corriger chaque ligne avant de générer les fiches.</span></div>
+      <textarea id="prompt-box" readonly onclick="this.select()"></textarea>
+      <button class="btn btn-p no-print" style="width:100%;margin-top:8px;" onclick="copyPrompt()">📋 Copier le prompt</button>
+    </div>
+
+    <label id="json-zone" class="upload-zone" for="json-atlas-input"
+      style="display:block;cursor:pointer;border-color:#27ae60;background:#f0fff4;">
+      <div class="uz-icon">📥</div>
+      <h3 style="font-size:16px;font-weight:700;color:#1e7e34;margin-bottom:6px;">Charger un fichier JSON</h3>
+      <p style="font-size:13px;color:var(--muted);line-height:1.5;">Réponse de Claude (tronçons) ou sauvegarde de session<br>Appuyer ou glisser-déposer</p>
+    </label>
+    <input type="file" id="json-atlas-input" accept=".json,application/json,text/plain" onchange="loadJSONSession(event)"
+      style="position:fixed;top:-100px;left:-100px;width:1px;height:1px;opacity:0;pointer-events:none;">
+
+    <div id="atlas-result" style="display:none;">
+      <div class="card">
+        <div class="card-title">✅ Tronçons extraits — Vérifier et corriger si nécessaire</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Modifiez directement dans le tableau. Supprimez les lignes erronées avant de générer.</p>
+        <div class="tbl-wrap">
+          <table class="tbl" id="vtable">
+            <thead><tr>
+              <th>#</th><th>Rue</th><th>Rg amont</th><th>Rg aval</th>
+              <th>Long.(m)</th><th>Ø/dim.</th><th>Profil</th><th>EU/EP/UN</th><th>Type</th>
+              <th>Alt.am.</th><th>Alt.av.</th><th>Prof.am.</th><th>Prof.av.</th><th></th>
+            </tr></thead>
+            <tbody id="vtbody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn btn-s no-print" style="flex:1;" onclick="addManualRow()">+ Ligne</button>
+          <button class="btn btn-p no-print" style="flex:2;" onclick="generateSheets()">✅ Générer les fiches</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✍️ Ou créer manuellement</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.5;">Sans PDF, allez dans <strong>🗂️ Tronçons → Nouveau tronçon</strong> pour saisir les infos à la main. Tout fonctionne 100&nbsp;% hors connexion.</p>
+    </div>
+  </div>
+
+  <!-- TRONÇONS -->
+  <div class="panel" id="panel-troncons">
+    <div class="card no-print">
+      <div class="card-title">🗓️ Infos de la campagne (pour la feuille de visite)</div>
+      <div class="fg c2">
+        <div class="fld"><label>Opérateur</label><input type="text" id="s-operateur" placeholder="Nom de l'opérateur" oninput="saveSessionMeta()"></div>
+        <div class="fld"><label>Campagne</label><input type="text" id="s-campagne" placeholder="Ex : 2026-S1" oninput="saveSessionMeta()"></div>
+      </div>
+      <div class="fg c2">
+        <div class="fld"><label>Date</label><input type="date" id="s-date" oninput="saveSessionMeta()"></div>
+        <div class="fld"><label>Conditions / Météo</label><input type="text" id="s-meteo" placeholder="Ex : sec, temps couvert" oninput="saveSessionMeta()"></div>
+      </div>
+    </div>
+    <div id="session-card" class="card" style="display:none;">
+      <div class="card-title">Session en cours</div>
+      <div id="session-details"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px;" class="no-print">
+      <button class="btn btn-p" style="font-size:13px;padding:10px 16px;" onclick="openNewTrc()">+ Nouveau tronçon</button>
+    </div>
+    <div id="troncons-list"></div>
+  </div>
+
+  <!-- VISITE -->
+  <div class="panel" id="panel-visite">
+    <div id="visite-header"></div>
+    <div id="obs-list"></div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="panel" id="panel-export">
+    <div class="card">
+      <div class="card-title">Résumé de la session</div>
+      <div class="stat-row"><span>Tronçons</span><span class="stat-val" id="st-trc">0</span></div>
+      <div class="stat-row"><span>🟢 Terminés</span><span class="stat-val" id="st-done" style="color:var(--grn);">0</span></div>
+      <div class="stat-row"><span>Observations totales</span><span class="stat-val" id="st-tot">0</span></div>
+      <div class="stat-row"><span>Défauts structurels (BA_)</span><span class="stat-val" id="st-b">0</span></div>
+      <div class="stat-row"><span>État fonctionnel (BB_/BD_)</span><span class="stat-val" id="st-c">0</span></div>
+      <div class="stat-row"><span>Importance 3–4 (à traiter)</span><span class="stat-val" id="st-crit" style="color:var(--red);">0</span></div>
+      <div class="stat-row"><span>📷 Photos</span><span class="stat-val" id="st-photos">0</span></div>
+      <div class="stat-row"><span>📍 Observations géolocalisées</span><span class="stat-val" id="st-gps">0</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Exporter</div>
+      <button class="exp-btn no-print" onclick="exportJSON()">📥 Sauvegarde JSON (session complète)</button>
+      <button class="exp-btn no-print" onclick="exportCSV()">📊 Tableau CSV (toutes observations)</button>
+      <button class="exp-btn no-print" onclick="exportGeoJSON()">🗺️ GeoJSON (points GPS → SIG/QGIS)</button>
+      <button class="exp-btn success no-print" onclick="exportFeuille()" style="font-weight:800;">📄 Feuille de visite officielle DEA 93 (PDF)</button>
+      <button class="exp-btn no-print" onclick="printReport()">🖨️ Rapport synthèse (portrait, avec photos)</button>
+      <div style="height:8px;"></div>
+      <label class="exp-btn no-print" style="cursor:pointer;">📂 Charger une sauvegarde JSON<input type="file" accept=".json" onchange="loadJSONSession(event)" style="display:none;"></label>
+      <div style="height:6px;"></div>
+      <button class="exp-btn danger no-print" onclick="clearAll()">🗑️ Effacer toutes les données</button>
+    </div>
+    <div class="card no-print">
+      <div class="card-title">Utilisation hors connexion</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;">
+        ✅ L'application fonctionne <strong>entièrement hors connexion</strong> (données stockées sur l'appareil, IndexedDB).<br>
+        📱 Android/iOS : ouvrir l'adresse de l'app dans Chrome/Safari → menu → <em>Ajouter à l'écran d'accueil / Installer l'application</em>. Elle se lance ensuite comme une vraie app, sans réseau.<br>
+        🔄 Transfert entre appareils : <em>Sauvegarde JSON</em> → <em>Charger JSON</em>.<br>
+        ⚠️ Le point <span style="color:#4caf50;">vert</span> en haut à droite = sauvegarde OK. S'il passe au <span style="color:#e53935;">rouge</span>, exportez immédiatement le JSON.<br>
+        ⚠️ Ne pas utiliser la navigation privée (les données seraient effacées à la fermeture).
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<button id="fab" onclick="openModal()"><span style="font-size:22px;line-height:1;">+</span> Observation</button>
+
+<!-- MODAL OBSERVATION -->
+<div id="overlay">
+  <div id="modal">
+    <div class="m-head"><h2 id="m-title">Nouvelle observation</h2><button class="m-close" onclick="closeModal()">✕</button></div>
+    <div class="m-body">
+      <div class="sh">📏 Distance depuis l'amont</div>
+      <div class="fg c2">
+        <div class="fld"><label>Distance cumulée (m)</label>
+          <input type="number" id="o-dist" placeholder="0" min="0" step="0.5" inputmode="decimal" style="font-size:22px;font-weight:700;text-align:center;"></div>
+        <div class="fld"><label>N° d'ordre</label>
+          <input type="number" id="o-num" placeholder="Auto" style="font-size:20px;text-align:center;"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="sh">📍 Zone de l'ouvrage</div>
+      <div class="zone-grid">
+        <button class="zb vg" onclick="pickZone('vg',this)">½ Voûte<br>Gauche</button>
+        <button class="zb vd" onclick="pickZone('vd',this)">½ Voûte<br>Droite</button>
+        <button class="zb pg" onclick="pickZone('pg',this)">Piedroit<br>Gauche</button>
+        <button class="zb pd" onclick="pickZone('pd',this)">Piedroit<br>Droit</button>
+        <button class="zb rad" style="grid-column:span 2;" onclick="pickZone('rad',this)">▶ Radier</button>
+        <button class="zb equip" onclick="pickZone('equip',this)">Équipements<br>(regard, Br…)</button>
+        <button class="zb rues" onclick="pickZone('rues',this)">Ouvrage<br>croisé</button>
+      </div>
+
+      <div id="ouvrage-panel" style="display:none;margin-top:10px;background:var(--plt);border:1.5px solid #8e44ad;border-radius:10px;padding:12px 14px;">
+        <div class="fld">
+          <label>Type d'ouvrage croisé</label>
+          <select id="ov-type" onchange="onOuvrageTypeChange()">
+            <option value="">— Choisir —</option>
+            <option value="canalisation">Canalisation</option>
+            <option value="ovoide">Ovoïde</option>
+          </select>
+        </div>
+        <div id="ov-detail-canalisation" class="ov-detail" style="display:none;margin-top:8px;">
+          <div class="fg c2">
+            <div class="fld"><label>Ø (mm)</label>
+              <select id="ov-diam" onchange="toggleOvDiamLibre(this.value)">
+                <option value="">—</option>
+                <option>200</option><option>300</option><option>400</option><option>500</option>
+                <option>600</option><option>700</option><option>800</option><option>900</option><option>1000</option>
+                <option value="__libre">Autre (saisie libre)…</option>
+              </select>
+              <input type="text" id="ov-diam-libre" placeholder="Préciser Ø…" style="display:none;margin-top:6px;">
+            </div>
+            <div class="fld"><label>Matériau</label>
+              <select id="ov-mat" onchange="toggleOvMatLibre(this.value)">
+                <option value="">—</option>
+                <option>Grès</option><option>Béton</option><option>PVC</option><option>Fibrociment</option>
+                <option value="__libre">Autre (saisie libre)…</option>
+              </select>
+              <input type="text" id="ov-mat-libre" placeholder="Préciser matériau…" style="display:none;margin-top:6px;">
+            </div>
+          </div>
+        </div>
+        <div id="ov-detail-ovoide" class="ov-detail" style="display:none;margin-top:8px;">
+          <div class="fld"><label>Ovoïde — description</label><input type="text" id="ov-ovoide" placeholder="Ex : ovoïde 800/1200, maçonnerie…"></div>
+        </div>
+      </div>
+
+      <div id="equip-panel" style="display:none;margin-top:10px;background:var(--glt);border:1.5px solid #27ae60;border-radius:10px;padding:12px 14px;">
+        <div class="fld">
+          <label>Type d'équipement</label>
+          <select id="eq-type" onchange="onEquipTypeChange()">
+            <option value="">— Choisir —</option>
+            <option value="branchement">Branchement</option>
+            <option value="regard">Regard d'accès</option>
+            <option value="avaloir">Bouche avaloir</option>
+            <option value="bap">BAP (barrage à poutrelles)</option>
+            <option value="vanne">Vanne</option>
+            <option value="gradin_escalier">Gradin / escalier</option>
+          </select>
+        </div>
+        <div id="eq-detail-branchement" class="eq-detail" style="display:none;margin-top:8px;">
+          <div class="fld"><label>Ø / taille</label><input type="text" id="eq-diam" placeholder="Ex : 200 mm"></div>
+        </div>
+        <div id="eq-detail-regard" class="eq-detail" style="display:none;margin-top:8px;">
+          <div style="background:#fff;border:1px solid #27ae60;border-radius:6px;padding:5px 9px;margin-bottom:8px;font-size:12px;color:#14511f;">
+            🔵 Repère regard : <strong id="eq-regard-id">R?</strong> <span style="color:var(--muted);font-weight:400;">(numérotation automatique dans l'ordre du tronçon)</span>
+          </div>
+          <div class="fg c2">
+            <div class="fld"><label>N° de police (repère surface)</label>
+              <input type="text" id="eq-police" placeholder="Ex : 30122"></div>
+            <div class="fld"><label>Distance depuis le regard précédent (m)</label>
+              <input type="number" id="eq-dist-prec" step="0.1" inputmode="decimal" placeholder="0"></div>
+          </div>
+          <div class="fld"><label>Travaux nécessaires sur l'accès ?</label>
+            <div class="toggle2">
+              <button type="button" class="tgl" data-key="travaux" data-val="1" onclick="toggleEq(this)">Oui</button>
+              <button type="button" class="tgl" data-key="travaux" data-val="0" onclick="toggleEq(this)">Non</button>
+            </div>
+          </div>
+        </div>
+        <div id="eq-detail-avaloir" class="eq-detail" style="display:none;margin-top:8px;">
+          <div class="fld"><label>Galerie</label>
+            <div class="toggle2">
+              <button type="button" class="tgl" data-key="galerie" data-val="1" onclick="toggleEq(this)">Avec galerie</button>
+              <button type="button" class="tgl" data-key="galerie" data-val="0" onclick="toggleEq(this)">Sans galerie</button>
+            </div>
+          </div>
+        </div>
+        <div id="eq-detail-bap" class="eq-detail" style="display:none;margin-top:8px;">
+          <div class="fg c2">
+            <div class="fld"><label>Poutrelles présentes ?</label>
+              <div class="toggle2">
+                <button type="button" class="tgl" data-key="poutrelles" data-val="1" onclick="toggleEq(this)">Oui</button>
+                <button type="button" class="tgl" data-key="poutrelles" data-val="0" onclick="toggleEq(this)">Non</button>
+              </div>
+            </div>
+            <div class="fld"><label>Rack de rangement ?</label>
+              <div class="toggle2">
+                <button type="button" class="tgl" data-key="rack" data-val="1" onclick="toggleEq(this)">Oui</button>
+                <button type="button" class="tgl" data-key="rack" data-val="0" onclick="toggleEq(this)">Non</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="eq-detail-vanne" class="eq-detail" style="display:none;margin-top:8px;">
+          <div class="fld"><label>Nature</label><input type="text" id="eq-nature" placeholder="Ex : vanne guillotine DN300"></div>
+        </div>
+        <div id="eq-detail-gradin_escalier" class="eq-detail" style="display:none;margin-top:8px;">
+          <div class="fld"><label>Type</label>
+            <div class="toggle2">
+              <button type="button" class="tgl" data-key="sousType" data-val="gradin" onclick="toggleEq(this)">Gradin</button>
+              <button type="button" class="tgl" data-key="sousType" data-val="escalier" onclick="toggleEq(this)">Escalier</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="sh">🔢 Code NF EN 13508-2</div>
+      <p id="code-optional-hint" style="display:none;font-size:11.5px;color:#1e7e34;background:var(--glt);border-radius:5px;padding:4px 9px;margin-bottom:6px;">ℹ️ Optionnel pour une observation d'équipement — remplissez-le seulement si un défaut (NF EN 13508-2) est aussi constaté sur cet équipement.</p>
+      <input type="text" id="code-search" placeholder="Rechercher : fissure, infiltration…" oninput="filterCodes()">
+      <div id="codes-box"></div>
+      <div class="fld" style="margin-top:8px;">
+        <label>Ou saisir le code manuellement</label>
+        <input type="text" id="o-code" placeholder="Ex : BAA, BDA, CAC…"
+          style="font-family:monospace;font-size:17px;font-weight:700;letter-spacing:1px;text-transform:uppercase;"
+          oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div class="divider"></div>
+      <div class="sh">⚠️ Importance</div>
+      <div class="sev-row">
+        <button class="sb s1" onclick="pickSev(1,this)">1<br><small style="font-weight:400;">Léger</small></button>
+        <button class="sb s2" onclick="pickSev(2,this)">2<br><small style="font-weight:400;">Modéré</small></button>
+        <button class="sb s3" onclick="pickSev(3,this)">3<br><small style="font-weight:400;">Important</small></button>
+        <button class="sb s4" onclick="pickSev(4,this)">4<br><small style="font-weight:400;">Critique</small></button>
+      </div>
+      <div class="fld" style="margin-top:8px;">
+        <label>Quantification</label>
+        <input type="text" id="o-quant" placeholder="Ex : L=2.5m, 30% section">
+      </div>
+      <div class="divider"></div>
+      <div class="sh">🕐 Position horaire (EN 13508-2)</div>
+      <div class="clock-wrap">
+        <svg viewBox="0 0 80 80" width="76" height="76" style="flex-shrink:0;">
+          <circle cx="40" cy="40" r="36" fill="#f0f5fc" stroke="#4a8fd9" stroke-width="2"/>
+          <text x="40" y="11" text-anchor="middle" font-size="9" fill="#1b3c77" font-weight="700" font-family="Arial">12</text>
+          <text x="73" y="44" text-anchor="start" font-size="9" fill="#1b3c77" font-family="Arial">3</text>
+          <text x="40" y="77" text-anchor="middle" font-size="9" fill="#1b3c77" font-weight="700" font-family="Arial">6</text>
+          <text x="7" y="44" text-anchor="end" font-size="9" fill="#1b3c77" font-family="Arial">9</text>
+          <circle cx="40" cy="40" r="3" fill="#1b3c77"/>
+          <line id="c-hand" x1="40" y1="40" x2="40" y2="16" stroke="#e03030" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div class="clock-btns">
+          <button class="cb" onclick="pickClock('12h00',this)">12h00</button>
+          <button class="cb" onclick="pickClock('01h30',this)">01h30</button>
+          <button class="cb" onclick="pickClock('03h00',this)">03h00</button>
+          <button class="cb" onclick="pickClock('04h30',this)">04h30</button>
+          <button class="cb" onclick="pickClock('06h00',this)">06h00</button>
+          <button class="cb" onclick="pickClock('07h30',this)">07h30</button>
+          <button class="cb" onclick="pickClock('09h00',this)">09h00</button>
+          <button class="cb" onclick="pickClock('10h30',this)">10h30</button>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-top:6px;">12h = sommet voûte · 6h = radier · Sens d'observation : regard vers l'aval</p>
+      <div class="divider"></div>
+      <div class="sh">📡 Position GPS (optionnel — pour l'export SIG)</div>
+      <div class="gps-row">
+        <button class="gps-btn" id="gps-btn" onclick="captureGPS()">📍 Capturer</button>
+        <span id="gps-info">Aucune position enregistrée</span>
+        <button id="gps-clear" onclick="clearGPS()">✕</button>
+      </div>
+      <div class="divider"></div>
+      <div class="sh">💬 Remarques libres</div>
+      <div class="fld"><label>Description complémentaire</label>
+        <textarea id="o-note" placeholder="Matériau, état général, mesures…"></textarea></div>
+      <div class="divider"></div>
+      <div style="background:#e8f4ff;border:1.5px solid #4a8fd9;border-radius:10px;padding:14px;">
+        <div class="sh" style="margin-top:0;color:#0b2f72;">📷 Photos de l'observation</div>
+        <div class="photo-btns">
+          <label class="photo-btn" for="photo-camera" onclick="saveObsDraft()">📷<br>Appareil photo</label>
+          <label class="photo-btn" for="photo-gallery" onclick="saveObsDraft()">🖼️<br>Galerie</label>
+        </div>
+        <input type="file" id="photo-camera" accept="image/*" capture="environment" onchange="handlePhotoInput(event)"
+          style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
+        <input type="file" id="photo-gallery" accept="image/*" multiple onchange="handlePhotoInput(event)"
+          style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
+        <div class="photo-strip" id="photo-strip"></div>
+        <p class="photo-note" id="photo-note">Max 6 photos · Compressées automatiquement</p>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-s" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-p" onclick="saveObs()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="lightbox">
+  <button id="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lb-img" src="" alt="">
+  <div id="lb-nav">
+    <button id="lb-prev" onclick="lbNav(-1)">‹</button>
+    <div id="lb-caption"></div>
+    <button id="lb-next" onclick="lbNav(1)">›</button>
+  </div>
+</div>
+
+<!-- MODAL TRONÇON -->
+<div id="trc-overlay" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.52);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div style="background:#fff;border-radius:16px 16px 0 0;margin-top:auto;max-height:95vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+    <div class="m-head">
+      <h2 id="trc-modal-title">Nouveau tronçon</h2>
+      <button class="m-close" onclick="closeTrcModal()">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="sh">🔢 Identification</div>
+      <div class="fg c2">
+        <div class="fld"><label>N° Tronçon</label><input type="text" id="t-num" placeholder="T01"></div>
+        <div class="fld"><label>Nature</label>
+          <select id="t-nature"><option>EU</option><option>EP</option><option>UN</option></select>
+        </div>
+      </div>
+      <div class="fg">
+        <div class="fld"><label>Rue / Voie</label><input type="text" id="t-rue" placeholder="Rue de Balagny"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="sh">📍 Localisation</div>
+      <div class="fg">
+        <div class="fld"><label>Territoire (EPT)</label>
+          <select id="t-ept" onchange="updateVilles()">
+            <option value="">— Choisir l'EPT —</option>
+            <option>Plaine Commune</option>
+            <option>Est Ensemble</option>
+            <option>Paris Terres d'Envol</option>
+            <option>Grand Paris Grand Est</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg c2">
+        <div class="fld"><label>Commune (liste)</label>
+          <select id="t-ville" onchange="document.getElementById('t-commune').value=this.value">
+            <option value="">— Sélectionner l'EPT d'abord —</option>
+          </select>
+        </div>
+        <div class="fld"><label>Commune (libre)</label>
+          <input type="text" id="t-commune" placeholder="Saisie directe…">
+        </div>
+      </div>
+      <div class="fg c2">
+        <div class="fld"><label>Type</label>
+          <select id="t-type"><option value="primaire">Primaire</option><option value="non_primaire">Non primaire</option></select>
+        </div>
+        <div class="fld"><label>Section de police (Galilée)</label><input type="text" id="t-secpol" placeholder="Ex : SP-123"></div>
+      </div>
+      <div class="fg">
+        <div class="fld"><label>Code Galilée tronçon</label><input type="text" id="t-galilee" placeholder="Code Galilée…"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="sh">📐 Géométrie</div>
+      <div class="fg c2">
+        <div class="fld"><label>Profil</label>
+          <select id="t-profil" onchange="toggleAutreProfil(this.value)">
+            <option>ovoïde</option>
+            <option>circulaire</option>
+            <option>rectangulaire</option>
+            <option>dallot</option>
+            <option>autre</option>
+          </select>
+          <input type="text" id="t-profil-autre" placeholder="Préciser le profil…"
+            style="display:none;margin-top:6px;width:100%;padding:10px 11px;border:1.5px solid var(--border);border-radius:6px;font-size:15px;font-family:inherit;">
+        </div>
+        <div class="fld"><label>Diamètre / Gabarit</label><input type="text" id="t-diam" placeholder="250/190"></div>
+      </div>
+      <div class="fg c2">
+        <div class="fld"><label>Longueur (m)</label><input type="number" id="t-long" placeholder="45" step="0.5" inputmode="decimal"></div>
+        <div class="fld"><label>Matériau</label>
+          <select id="t-materiau">
+            <option value="">—</option>
+            <option>Grès</option><option>Béton</option><option>PVC</option><option>Fibrociment</option>
+            <option>Maçonnerie</option><option>Fonte</option><option>Amiante-ciment</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg c2">
+        <div class="fld"><label>Pente (mm/m)</label><input type="number" id="t-pente" placeholder="5.2" step="0.1" inputmode="decimal"></div>
+        <div class="fld"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="sh">🔵 Regard amont</div>
+      <div class="fg c2">
+        <div class="fld"><label>ID regard amont</label><input type="text" id="t-ram" placeholder="30122"></div>
+        <div class="fld"><label>Altitude ZR am. (m NGF)</label><input type="number" id="t-alt-am" placeholder="39.47" step="0.01" inputmode="decimal"></div>
+      </div>
+      <div class="fg c2">
+        <div class="fld"><label>Profondeur am. (m)</label><input type="number" id="t-prof-am" placeholder="4.10" step="0.01" inputmode="decimal"></div>
+        <div class="fld"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="sh">🔴 Regard aval</div>
+      <div class="fg c2">
+        <div class="fld"><label>ID regard aval</label><input type="text" id="t-rav" placeholder="35024"></div>
+        <div class="fld"><label>Altitude ZR av. (m NGF)</label><input type="number" id="t-alt-av" placeholder="39.10" step="0.01" inputmode="decimal"></div>
+      </div>
+      <div class="fg c2">
+        <div class="fld"><label>Profondeur av. (m)</label><input type="number" id="t-prof-av" placeholder="4.44" step="0.01" inputmode="decimal"></div>
+        <div class="fld"></div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-s" onclick="closeTrcModal()">Annuler</button>
+      <button class="btn btn-p" onclick="saveTrcModal()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="report"></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+// ════════════════════════════════════════
+//  EPT DATA — Seine-Saint-Denis (93)
+// ════════════════════════════════════════
+const EPTS={
+  'Plaine Commune':[
+    'Aubervilliers','Épinay-sur-Seine',"L'Île-Saint-Denis",
+    'La Courneuve','Pierrefitte-sur-Seine','Saint-Denis',
+    'Saint-Ouen-sur-Seine','Stains','Villetaneuse'
+  ],
+  'Est Ensemble':[
+    'Bagnolet','Bobigny','Bondy','Le Pré-Saint-Gervais',
+    'Les Lilas','Montreuil','Noisy-le-Sec','Pantin','Romainville'
+  ],
+  "Paris Terres d'Envol":[
+    'Aulnay-sous-Bois','Le Blanc-Mesnil','Le Bourget',
+    'Drancy','Dugny','Sevran','Tremblay-en-France','Villepinte'
+  ],
+  'Grand Paris Grand Est':[
+    'Clichy-sous-Bois','Coubron','Gagny','Gournay-sur-Marne',
+    'Le Raincy','Livry-Gargan','Montfermeil','Neuilly-Plaisance',
+    'Neuilly-sur-Marne','Noisy-le-Grand','Rosny-sous-Bois',
+    'Vaujours','Villemomble'
+  ]
+};
+
+function updateVilles(){
+  const ept=document.getElementById('t-ept').value;
+  const sel=document.getElementById('t-ville');
+  sel.innerHTML='<option value="">— Sélectionner —</option>';
+  if(ept&&EPTS[ept])EPTS[ept].forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
+  document.getElementById('t-commune').value='';
+}
+
+function toggleAutreProfil(v){
+  const el=document.getElementById('t-profil-autre');
+  el.style.display=v==='autre'?'block':'none';
+  if(v!=='autre')el.value='';
+}
+
+function eptForCommune(c){
+  for(const[ept,villes] of Object.entries(EPTS)){if(villes.includes(c))return ept;}
+  return '';
+}
+
+const CODES=[
+// ── DÉFORMATION ────────────────────────────────────────────────
+{g:"Déformation (BAA)",cls:"B",code:"BAA A",desc:"Réduction verticale de la section"},
+{g:"Déformation (BAA)",cls:"B",code:"BAA B",desc:"Réduction horizontale de la section"},
+// ── FISSURES ───────────────────────────────────────────────────
+{g:"Fissures (BAB)",cls:"B",code:"BAB A",desc:"Micro-fissures"},
+{g:"Fissures (BAB)",cls:"B",code:"BAB B",desc:"Fissures fermées"},
+{g:"Fissures (BAB)",cls:"B",code:"BAB B A",desc:"Fissure longitudinale fermée"},
+{g:"Fissures (BAB)",cls:"B",code:"BAB B B",desc:"Fissure circonférentielle fermée"},
+{g:"Fissures (BAB)",cls:"B",code:"BAB B C",desc:"Fissure complexe fermée"},
+{g:"Fissures (BAB)",cls:"B",code:"BAB C",desc:"Fissures ouvertes"},
+{g:"Fissures (BAB)",cls:"B",code:"BAB C A",desc:"Fissure longitudinale ouverte"},
+{g:"Fissures (BAB)",cls:"B",code:"BAB C B",desc:"Fissure circonférentielle ouverte"},
+{g:"Fissures (BAB)",cls:"B",code:"BAB C C",desc:"Fissure complexe ouverte"},
+// ── RUPTURES / EFFONDREMENTS ───────────────────────────────────
+{g:"Ruptures / Effondrements (BAC)",cls:"B",code:"BAC A",desc:"Rupture"},
+{g:"Ruptures / Effondrements (BAC)",cls:"B",code:"BAC B",desc:"Effondrement partiel"},
+{g:"Ruptures / Effondrements (BAC)",cls:"B",code:"BAC C",desc:"Effondrement total"},
+// ── MAÇONNERIE / BRIQUETAGE ────────────────────────────────────
+{g:"Maçonnerie / Briquetage (BAD-BAE)",cls:"B",code:"BAD A",desc:"Élément de maçonnerie déplacé"},
+{g:"Maçonnerie / Briquetage (BAD-BAE)",cls:"B",code:"BAD B",desc:"Pièce(s) de maçonnerie manquante(s)"},
+{g:"Maçonnerie / Briquetage (BAD-BAE)",cls:"B",code:"BAD C",desc:"Affaissement du radier — maçonnerie"},
+{g:"Maçonnerie / Briquetage (BAD-BAE)",cls:"B",code:"BAD D",desc:"Effondrement de maçonnerie"},
+{g:"Maçonnerie / Briquetage (BAD-BAE)",cls:"B",code:"BAE",desc:"Mortier manquant"},
+// ── DÉGRADATION DE SURFACE ─────────────────────────────────────
+{g:"Dégradation de surface (BAF)",cls:"B",code:"BAF A",desc:"Rugosité accrue"},
+{g:"Dégradation de surface (BAF)",cls:"B",code:"BAF B",desc:"Écaillage"},
+{g:"Dégradation de surface (BAF)",cls:"B",code:"BAF C",desc:"Granulats exposés"},
+{g:"Dégradation de surface (BAF)",cls:"B",code:"BAF D",desc:"Granulats déchaussés"},
+{g:"Dégradation de surface (BAF)",cls:"B",code:"BAF E",desc:"Granulats manquants"},
+{g:"Dégradation de surface (BAF)",cls:"B",code:"BAF F",desc:"Armature visible"},
+{g:"Dégradation de surface (BAF)",cls:"B",code:"BAF G",desc:"Armature dépassant de la surface"},
+{g:"Dégradation de surface (BAF)",cls:"B",code:"BAF H",desc:"Armature corrodée"},
+{g:"Dégradation de surface (BAF)",cls:"B",code:"BAF I",desc:"Paroi manquante"},
+// ── BRANCHEMENTS / RACCORDEMENTS ──────────────────────────────
+{g:"Branchements / Raccordements (BAG-BAH)",cls:"B",code:"BAG",desc:"Branchement pénétrant"},
+{g:"Branchements / Raccordements (BAG-BAH)",cls:"B",code:"BAH A",desc:"Position incorrecte du raccordement"},
+{g:"Branchements / Raccordements (BAG-BAH)",cls:"B",code:"BAH B",desc:"Vide entre raccordement et canalisation principale"},
+{g:"Branchements / Raccordements (BAG-BAH)",cls:"B",code:"BAH C",desc:"Vide partiel entre raccordement et canalisation"},
+{g:"Branchements / Raccordements (BAG-BAH)",cls:"B",code:"BAH D",desc:"Conduite de raccordement endommagée"},
+{g:"Branchements / Raccordements (BAG-BAH)",cls:"B",code:"BAH E",desc:"Conduite de raccordement obturée"},
+// ── ASSEMBLAGE / JOINTS ────────────────────────────────────────
+{g:"Assemblage / Joints (BAI-BAJ)",cls:"B",code:"BAI A",desc:"Anneau d'étanchéité déplacé ou pénétrant"},
+{g:"Assemblage / Joints (BAI-BAJ)",cls:"B",code:"BAJ A",desc:"Déboîtement longitudinal"},
+{g:"Assemblage / Joints (BAI-BAJ)",cls:"B",code:"BAJ B",desc:"Décentrage radial"},
+{g:"Assemblage / Joints (BAI-BAJ)",cls:"B",code:"BAJ C",desc:"Déviation angulaire"},
+// ── DÉFAUT DE REVÊTEMENT ────────────────────────────────────────
+{g:"Défaut de revêtement (BAK)",cls:"B",code:"BAK A",desc:"Revêtement détaché"},
+{g:"Défaut de revêtement (BAK)",cls:"B",code:"BAK D",desc:"Revêtement ondulé"},
+{g:"Défaut de revêtement (BAK)",cls:"B",code:"BAK E",desc:"Revêtement cloqué / renflement interne"},
+{g:"Défaut de revêtement (BAK)",cls:"B",code:"BAK G",desc:"Détachement du revêtement intérieur"},
+{g:"Défaut de revêtement (BAK)",cls:"B",code:"BAK I",desc:"Fissure ou fente dans le revêtement"},
+{g:"Défaut de revêtement (BAK)",cls:"B",code:"BAK J",desc:"Trou dans le revêtement"},
+// ── RÉPARATION DÉFECTUEUSE ─────────────────────────────────────
+{g:"Réparation défectueuse (BAL)",cls:"B",code:"BAL A",desc:"Paroi manquante après réparation"},
+{g:"Réparation défectueuse (BAL)",cls:"B",code:"BAL C",desc:"Détachement du matériau de réparation"},
+{g:"Réparation défectueuse (BAL)",cls:"B",code:"BAL E",desc:"Excès de matériau — obstacle"},
+{g:"Réparation défectueuse (BAL)",cls:"B",code:"BAL G",desc:"Fissure dans le matériau de réparation"},
+// ── PAROI / SOL / VIDE ─────────────────────────────────────────
+{g:"Paroi / Sol / Vide (BAN-BAP)",cls:"B",code:"BAN",desc:"Conduite poreuse"},
+{g:"Paroi / Sol / Vide (BAN-BAP)",cls:"B",code:"BAO",desc:"Sol visible par le défaut"},
+{g:"Paroi / Sol / Vide (BAN-BAP)",cls:"B",code:"BAP",desc:"Vide visible par le défaut"},
+// ── RACINES ────────────────────────────────────────────────────
+{g:"Racines (BBA)",cls:"C",code:"BBA A",desc:"Grosse racine isolée"},
+{g:"Racines (BBA)",cls:"C",code:"BBA B",desc:"Radicelles"},
+{g:"Racines (BBA)",cls:"C",code:"BBA C",desc:"Ensemble complexe de racines"},
+// ── DÉPÔTS ADHÉRENTS ───────────────────────────────────────────
+{g:"Dépôts adhérents (BBB)",cls:"C",code:"BBB A",desc:"Concrétions"},
+{g:"Dépôts adhérents (BBB)",cls:"C",code:"BBB B",desc:"Dépôt de graisse"},
+{g:"Dépôts adhérents (BBB)",cls:"C",code:"BBB C",desc:"Encrassement de la paroi"},
+// ── DÉPÔTS SUR RADIER ──────────────────────────────────────────
+{g:"Dépôts sur radier (BBC)",cls:"C",code:"BBC A",desc:"Matériau fin (sable, limon)"},
+{g:"Dépôts sur radier (BBC)",cls:"C",code:"BBC B",desc:"Matériau grossier (gravats)"},
+{g:"Dépôts sur radier (BBC)",cls:"C",code:"BBC C",desc:"Matériau dur ou compacté"},
+// ── ENTRÉE DE TERRE ────────────────────────────────────────────
+{g:"Entrée de terre (BBD)",cls:"C",code:"BBD A",desc:"Entrée de sable"},
+{g:"Entrée de terre (BBD)",cls:"C",code:"BBD C",desc:"Entrée de matériau fin"},
+{g:"Entrée de terre (BBD)",cls:"C",code:"BBD D",desc:"Entrée de gravier"},
+// ── OBSTACLES ──────────────────────────────────────────────────
+{g:"Obstacles (BBE)",cls:"C",code:"BBE A",desc:"Maçonnerie / briquetage sur le radier"},
+{g:"Obstacles (BBE)",cls:"C",code:"BBE B",desc:"Fragments de conduite sur le radier"},
+{g:"Obstacles (BBE)",cls:"C",code:"BBE C",desc:"Autre objet sur le radier"},
+{g:"Obstacles (BBE)",cls:"C",code:"BBE D",desc:"Obstacle dépassant de la paroi"},
+{g:"Obstacles (BBE)",cls:"C",code:"BBE E",desc:"Obstacle coincé dans l'assemblage"},
+{g:"Obstacles (BBE)",cls:"C",code:"BBE G",desc:"Conduites ou câbles insérés dans la canalisation"},
+// ── INFILTRATION ───────────────────────────────────────────────
+{g:"Infiltration (BBF)",cls:"C",code:"BBF A",desc:"Suintement — lente pénétration d'eau"},
+{g:"Infiltration (BBF)",cls:"C",code:"BBF B",desc:"Infiltration en gouttes"},
+{g:"Infiltration (BBF)",cls:"C",code:"BBF C",desc:"Infiltration — écoulement continu"},
+{g:"Infiltration (BBF)",cls:"C",code:"BBF D",desc:"Infiltration — jaillissement"},
+// ── EXFILTRATION / VERMINE ─────────────────────────────────────
+{g:"Exfiltration / Vermine (BBG-BBH)",cls:"C",code:"BBG",desc:"Exfiltration visible"},
+{g:"Exfiltration / Vermine (BBG-BBH)",cls:"C",code:"BBH A",desc:"Présence de rats"},
+{g:"Exfiltration / Vermine (BBG-BBH)",cls:"C",code:"BBH B",desc:"Présence de cafards"},
+// ── NIVEAU D'EAU ───────────────────────────────────────────────
+{g:"Niveau d'eau (BDD)",cls:"C",code:"BDD A",desc:"Eaux claires"},
+{g:"Niveau d'eau (BDD)",cls:"C",code:"BDD C",desc:"Eaux troubles"},
+{g:"Niveau d'eau (BDD)",cls:"C",code:"BDD D",desc:"Eaux colorées"},
+{g:"Niveau d'eau (BDD)",cls:"C",code:"BDD E",desc:"Eaux troubles et colorées"},
+// ── ÉCOULEMENT ENTRANT ─────────────────────────────────────────
+{g:"Écoulement entrant (BDE)",cls:"C",code:"BDE A",desc:"Écoulement clair — canalisation entrante"},
+{g:"Écoulement entrant (BDE)",cls:"C",code:"BDE A A",desc:"Écoulement clair — raccordement EU/eaux de surface"},
+{g:"Écoulement entrant (BDE)",cls:"C",code:"BDE C",desc:"Écoulement trouble — canalisation entrante"},
+{g:"Écoulement entrant (BDE)",cls:"C",code:"BDE D",desc:"Écoulement coloré — canalisation entrante"},
+// ── ATMOSPHÈRE — SÉCURITÉ ──────────────────────────────────────
+{g:"Atmosphère — SÉCURITÉ (BDF)",cls:"C",code:"BDF A",desc:"⚠️ Manque d'oxygène"},
+{g:"Atmosphère — SÉCURITÉ (BDF)",cls:"C",code:"BDF B",desc:"⚠️ Présence de H₂S (sulfure d'hydrogène)"},
+{g:"Atmosphère — SÉCURITÉ (BDF)",cls:"C",code:"BDF C",desc:"⚠️ Présence de méthane"},
+{g:"Atmosphère — SÉCURITÉ (BDF)",cls:"C",code:"BDF Z",desc:"⚠️ Atmosphère dangereuse — autre"},
+];
+
+const ZONES={
+  vg:{label:'½ Voûte G',cls:'bvg'},vd:{label:'½ Voûte D',cls:'bvd'},
+  pg:{label:'Piedroit G',cls:'bpg'},pd:{label:'Piedroit D',cls:'bpd'},
+  rad:{label:'Radier',cls:'brad'},equip:{label:'Équipements',cls:'bequip'},
+  rues:{label:'Ouvrage croisé',cls:'brues'},
+};
+const SVC=['','#43a047','#ffa000','#e64a19','#c62828'];
+const SVL=['','①','②','③','④'];
+const MAX_PH=6,MAX_PX=1200,QUAL=0.72;
+
+let session={version:2,atlas:'',date:'',operateur:'',campagne:'',meteo:'',troncons:[]};
+let curTrc=null,editObs=null;
+let selZone=null,selCode=null,selSev=null,selClock=null,selGPS=null;
+let curPhotos=[],lbPhotos=[],lbIdx=0;
+let pending=[];
+
+const PROMPT=`Tu analyses un atlas linéaire de réseau d'assainissement (DEA 93 ou équivalent) joint à ce message.
+Extrais TOUS les tronçons présents dans ce document. Un tronçon = section entre deux regards consécutifs.
+Réponds UNIQUEMENT avec un JSON valide, sans texte ni markdown :
+{"troncons":[{"num":"identifiant du tronçon","rue":"nom de la voie","commune":"commune","regard_am":"ID regard amont","regard_av":"ID regard aval","alt_am":12.45,"alt_av":12.30,"prof_am":3.20,"prof_av":3.35,"longueur":45.5,"diametre":"400","profil":"ovoïde","nature":"EU","type":"primaire","pente":3.3}]}
+Règles : nature=EU/EP/UN · type=primaire ou non_primaire · valeurs numériques sans unités · null si valeur absente · Inclure TOUS les tronçons.`;
+
+// ════════════════════════════════════════
+//  UTILITAIRES FIABILITÉ
+// ════════════════════════════════════════
+// Échappement HTML systématique de toute donnée saisie
+function e(s){return s==null?'':String(s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+// Nombre ou null — accepte la virgule décimale, PRÉSERVE la valeur 0
+function numOrNull(v){
+  if(v==null)return null;
+  const s=String(v).trim().replace(',','.');
+  if(s==='')return null;
+  const n=parseFloat(s);
+  return Number.isFinite(n)?n:null;
+}
+// Cellule CSV correctement échappée (RFC 4180)
+function csvCell(v){
+  v=v==null?'':String(v);
+  return /[",\n\r;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;
+}
+
+// ════════════════════════════════════════
+//  STOCKAGE — IndexedDB (photos volumineuses OK)
+// ════════════════════════════════════════
+const DB_NAME='dea93',DB_STORE='kv';
+let dbPromise=null;
+function idb(){
+  if(dbPromise)return dbPromise;
+  dbPromise=new Promise((res,rej)=>{
+    const q=indexedDB.open(DB_NAME,1);
+    q.onupgradeneeded=()=>q.result.createObjectStore(DB_STORE);
+    q.onsuccess=()=>res(q.result);
+    q.onerror=()=>rej(q.error||new Error('IndexedDB indisponible'));
+  });
+  return dbPromise;
+}
+function idbSet(k,v){return idb().then(d=>new Promise((res,rej)=>{
+  const tx=d.transaction(DB_STORE,'readwrite');
+  tx.objectStore(DB_STORE).put(v,k);
+  tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);tx.onabort=()=>rej(tx.error||new Error('Transaction annulée'));
+}));}
+function idbGet(k){return idb().then(d=>new Promise((res,rej)=>{
+  const r=d.transaction(DB_STORE).objectStore(DB_STORE).get(k);
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
+}));}
+function idbClear(){return idb().then(d=>new Promise((res,rej)=>{
+  const tx=d.transaction(DB_STORE,'readwrite');
+  tx.objectStore(DB_STORE).clear();
+  tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);
+}));}
+
+function setSaveDot(ok){
+  const dot=document.getElementById('save-dot');
+  dot.classList.toggle('err',!ok);
+  dot.title=ok?'Sauvegarde OK':'ÉCHEC de sauvegarde — exportez le JSON !';
+}
+let saveTimer=null;
+function persist(){
+  try{localStorage.setItem('dea_ct',curTrc||'');}catch(_){}
+  updateTopBar();
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    idbSet('session',session)
+      .then(()=>setSaveDot(true))
+      .catch(err=>{
+        setSaveDot(false);
+        toast('❌ ÉCHEC de sauvegarde ('+(err&&err.name||'erreur')+') — exportez le JSON !');
+      });
+  },150);
+}
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  document.getElementById('prompt-box').value=PROMPT;
+  // Chargement : IndexedDB d'abord, puis migration automatique depuis l'ancien localStorage
+  try{
+    let s=await idbGet('session');
+    if(!s){
+      const ls=localStorage.getItem('dea_s');
+      if(ls){s=JSON.parse(ls);await idbSet('session',s);localStorage.removeItem('dea_s');toast('🔄 Données migrées vers le nouveau stockage');}
+    }
+    if(s&&Array.isArray(s.troncons))session=s;
+  }catch(err){
+    // Dernier recours : ancien localStorage
+    try{const ls=localStorage.getItem('dea_s');if(ls)session=JSON.parse(ls);}catch(_){}
+    setSaveDot(false);
+    toast('⚠️ Stockage local en difficulté — exportez régulièrement le JSON');
+  }
+  try{curTrc=localStorage.getItem('dea_ct')||null;}catch(_){}
+  if(curTrc&&!session.troncons.some(t=>t.id===curTrc))curTrc=null;
+  if(!session.date)session.date=new Date().toISOString().split('T')[0];
+  renderCodesList('');renderTroncons();renderVisiteHeader();renderObsList();updateTopBar();updateStats();
+  // PWA : service worker (uniquement si servi en http/https)
+  if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+  // Reprise après un rechargement de page survenu pendant une prise de photo (voir plus bas)
+  idbGet('obsDraft').then(restoreObsDraft).catch(()=>{});
+});
+
+// Filet de sécurité : avertir si on quitte pendant qu'une sauvegarde est en attente
+window.addEventListener('beforeunload',ev=>{
+  if(saveTimer){idbSet('session',session).catch(()=>{});}
+});
+
+function goTab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('panel-'+id).classList.add('on');btn.classList.add('on');
+  document.getElementById('fab').style.display=id==='visite'?'flex':'none';
+  if(id==='export')updateStats();if(id==='troncons')renderTroncons();if(id==='visite')renderObsList();
+}
+function gotoTab(id){
+  const btns=document.querySelectorAll('.tab');
+  const map={atlas:0,troncons:1,visite:2,export:3};
+  goTab(id,btns[map[id]]);
+}
+
+function updateTopBar(){
+  const done=session.troncons.filter(t=>t.status==='done').length;
+  const tot=session.troncons.length;
+  document.getElementById('sbadge').textContent=done+'/'+tot;
+  const t=curTrc?session.troncons.find(x=>x.id===curTrc):null;
+  document.getElementById('top-sub').textContent=t?('En visite : '+(t.rue||(t.regard_am+'→'+t.regard_av))):
+    tot?('Session : '+tot+' tronçon(s)'):'Aucune session — charger un JSON ou créer des tronçons';
+}
+
+// ── PROMPT ──
+function copyPrompt(){
+  const box=document.getElementById('prompt-box');
+  box.select();box.setSelectionRange(0,99999);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(PROMPT).then(()=>toast('📋 Prompt copié'),()=>{document.execCommand('copy');toast('📋 Prompt copié');});
+  }else{document.execCommand('copy');toast('📋 Prompt copié');}
+}
+
+// ── TABLE DE VALIDATION ──
+function renderVTable(trcs){
+  document.getElementById('vtbody').innerHTML=trcs.map((t,i)=>`<tr>
+    <td>${i+1}</td>
+    <td><input value="${e(t.rue)}" oninput="pending[${i}].rue=this.value"></td>
+    <td><input value="${e(t.regard_am)}" oninput="pending[${i}].regard_am=this.value"></td>
+    <td><input value="${e(t.regard_av)}" oninput="pending[${i}].regard_av=this.value"></td>
+    <td><input type="number" value="${t.longueur??''}" style="width:60px;" oninput="pending[${i}].longueur=numOrNull(this.value)"></td>
+    <td><input value="${e(t.diametre)}" style="width:65px;" oninput="pending[${i}].diametre=this.value"></td>
+    <td><select onchange="pending[${i}].profil=this.value">${['ovoïde','circulaire','rectangulaire','dallot','autre'].map(p=>`<option ${t.profil===p?'selected':''}>${p}</option>`).join('')}</select></td>
+    <td><select onchange="pending[${i}].nature=this.value">${['EU','EP','UN'].map(n=>`<option ${t.nature===n?'selected':''}>${n}</option>`).join('')}</select></td>
+    <td><select onchange="pending[${i}].type=this.value"><option ${t.type==='primaire'?'selected':''}>primaire</option><option ${t.type==='non_primaire'?'selected':''}>non_primaire</option></select></td>
+    <td><input type="number" step="0.01" value="${t.alt_am??''}" style="width:68px;" oninput="pending[${i}].alt_am=numOrNull(this.value)"></td>
+    <td><input type="number" step="0.01" value="${t.alt_av??''}" style="width:68px;" oninput="pending[${i}].alt_av=numOrNull(this.value)"></td>
+    <td><input type="number" step="0.01" value="${t.prof_am??''}" style="width:60px;" oninput="pending[${i}].prof_am=numOrNull(this.value)"></td>
+    <td><input type="number" step="0.01" value="${t.prof_av??''}" style="width:60px;" oninput="pending[${i}].prof_av=numOrNull(this.value)"></td>
+    <td><button onclick="pending.splice(${i},1);renderVTable(pending);" style="background:none;border:none;color:#ddd;font-size:16px;cursor:pointer;">✕</button></td>
+  </tr>`).join('');
+}
+
+function addManualRow(){
+  pending.push({num:'T'+(pending.length+1),rue:'',commune:'',regard_am:'',regard_av:'',
+    longueur:null,diametre:'',profil:'ovoïde',nature:'EU',type:'non_primaire',
+    alt_am:null,alt_av:null,prof_am:null,prof_av:null,pente:null});
+  renderVTable(pending);document.getElementById('atlas-result').style.display='block';
+}
+
+function generateSheets(){
+  if(!pending.length){toast('⚠️ Aucun tronçon');return;}
+  if(session.troncons.length&&!confirm('⚠️ Remplacer les '+session.troncons.length+' tronçon(s) existants (et leurs observations) par les '+pending.length+' nouveaux ?\n\nConseil : exportez d\'abord le JSON si nécessaire.'))return;
+  session.troncons=pending.map((t,i)=>({
+    id:'trc_'+Date.now()+'_'+i,num:t.num||'T'+(i+1),rue:t.rue||'',commune:t.commune||'',
+    regard_am:t.regard_am||'',regard_av:t.regard_av||'',longueur:numOrNull(t.longueur),
+    diametre:t.diametre||'',profil:t.profil||'ovoïde',nature:t.nature||'EU',
+    type:t.type||'non_primaire',alt_am:numOrNull(t.alt_am),alt_av:numOrNull(t.alt_av),
+    prof_am:numOrNull(t.prof_am),prof_av:numOrNull(t.prof_av),pente:numOrNull(t.pente),
+    observations:[],status:'pending',created_at:new Date().toISOString()
+  }));
+  curTrc=null;
+  persist();pending=[];document.getElementById('atlas-result').style.display='none';
+  renderTroncons();updateStats();gotoTab('troncons');
+  toast('✅ '+session.troncons.length+' fiches créées');
+}
+
+// ── INFOS SESSION (campagne) ──
+function fillSessionMeta(){
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  set('s-operateur',session.operateur);
+  set('s-campagne',session.campagne);
+  set('s-meteo',session.meteo);
+  set('s-date',session.date);
+}
+function saveSessionMeta(){
+  session.operateur=document.getElementById('s-operateur').value;
+  session.campagne=document.getElementById('s-campagne').value;
+  session.meteo=document.getElementById('s-meteo').value;
+  const d=document.getElementById('s-date').value;if(d)session.date=d;
+  persist();
+}
+
+// ── TRONÇONS ──
+function renderTroncons(){
+  const list=document.getElementById('troncons-list');
+  fillSessionMeta();
+  if(!session.troncons.length){
+    list.innerHTML='<div class="empty"><div class="ico">🗂️</div><h3>Aucun tronçon</h3><p>Chargez un JSON (onglet Atlas) ou ajoutez manuellement.</p></div>';
+    document.getElementById('session-card').style.display='none';return;
+  }
+  document.getElementById('session-card').style.display='block';
+  document.getElementById('session-details').innerHTML=
+    `<span style="font-size:13px;color:var(--muted);">📅 ${e(session.date)||'—'} &nbsp;·&nbsp; 📂 ${e(session.atlas)||'Saisie manuelle'} &nbsp;·&nbsp; ${session.troncons.filter(t=>t.status==='done').length}/${session.troncons.length} terminés</span>`;
+  list.innerHTML=session.troncons.map(t=>{
+    const n=t.observations.length;
+    const st=t.status==='done'?'<span class="status s-d">🟢 Terminé</span>':
+      n>0?'<span class="status s-i">🟡 En cours</span>':'<span class="status s-p">🔵 En attente</span>';
+    return `<div class="trc-card ${t.id===curTrc?'act':''}">
+      <div class="trc-num" onclick="selectTrc('${t.id}')">${e(t.num)}<small>${e(t.nature)}</small></div>
+      <div class="trc-body" onclick="selectTrc('${t.id}')">
+        <div class="trc-rue">${e(t.rue)||'—'}</div>
+        <div class="trc-info">${e(t.regard_am)||'?'} → ${e(t.regard_av)||'?'}${t.longueur!=null?' · '+t.longueur+'m':''}${t.diametre?' · Ø'+e(t.diametre):''}${t.type==='primaire'?' · <strong>PRIMAIRE</strong>':''}</div>
+      </div>
+      <div class="trc-r">${st}<span style="font-size:12px;color:var(--muted);">${n} obs.</span>
+        <button onclick="event.stopPropagation();openTrcModal('${t.id}')"
+          style="background:var(--blt);border:1px solid var(--border);border-radius:6px;color:var(--bdk);font-size:12px;padding:4px 9px;cursor:pointer;margin-top:2px;">✏️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectTrc(id){
+  curTrc=id;persist();renderTroncons();renderVisiteHeader();renderObsList();gotoTab('visite');
+}
+function openNewTrc(){ openTrcModal(null); }
+
+// ── TRONÇON MODAL ──
+let editTrcId=null;
+function openTrcModal(id){
+  editTrcId=id||null;
+  document.getElementById('trc-modal-title').textContent=id?'Modifier le tronçon':'Nouveau tronçon';
+  const ids=['t-num','t-rue','t-commune','t-long','t-diam','t-ram','t-rav','t-alt-am','t-alt-av','t-prof-am','t-prof-av','t-pente','t-profil-autre','t-secpol','t-galilee','t-materiau'];
+  ids.forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  document.getElementById('t-ept').value='';
+  document.getElementById('t-ville').innerHTML="<option value=''>— Sélectionner l'EPT d'abord —</option>";
+  document.getElementById('t-profil-autre').style.display='none';
+  if(id){
+    const t=session.troncons.find(x=>x.id===id);
+    if(t){
+      document.getElementById('t-num').value=t.num||'';
+      document.getElementById('t-rue').value=t.rue||'';
+      document.getElementById('t-commune').value=t.commune||'';
+      document.getElementById('t-diam').value=t.diametre||'';
+      document.getElementById('t-long').value=t.longueur??'';
+      document.getElementById('t-pente').value=t.pente??'';
+      document.getElementById('t-ram').value=t.regard_am||'';
+      document.getElementById('t-rav').value=t.regard_av||'';
+      document.getElementById('t-alt-am').value=t.alt_am??'';
+      document.getElementById('t-alt-av').value=t.alt_av??'';
+      document.getElementById('t-prof-am').value=t.prof_am??'';
+      document.getElementById('t-prof-av').value=t.prof_av??'';
+      document.getElementById('t-nature').value=t.nature||'EU';
+      document.getElementById('t-type').value=t.type||'non_primaire';
+      document.getElementById('t-materiau').value=t.materiau||'';
+      document.getElementById('t-secpol').value=t.section_police||'';
+      document.getElementById('t-galilee').value=t.code_galilee||'';
+      const stdProfils=['ovoïde','circulaire','rectangulaire','dallot','autre'];
+      const pv=t.profil||'ovoïde';
+      if(stdProfils.includes(pv)){
+        document.getElementById('t-profil').value=pv;
+        document.getElementById('t-profil-autre').style.display='none';
+      } else {
+        document.getElementById('t-profil').value='autre';
+        document.getElementById('t-profil-autre').value=pv;
+        document.getElementById('t-profil-autre').style.display='block';
+      }
+      const ept=eptForCommune(t.commune||'');
+      if(ept){
+        document.getElementById('t-ept').value=ept;
+        updateVilles();
+        document.getElementById('t-ville').value=t.commune||'';
+        document.getElementById('t-commune').value=t.commune||'';
+      }
+    }
+  }else{
+    document.getElementById('t-num').value='T'+(session.troncons.length+1);
+    document.getElementById('t-nature').value='EU';
+    document.getElementById('t-type').value='non_primaire';
+    document.getElementById('t-profil').value='ovoïde';
+  }
+  const ov=document.getElementById('trc-overlay');ov.style.display='flex';ov.style.flexDirection='column';
+  setTimeout(()=>document.getElementById('t-rue').focus(),200);
+}
+function closeTrcModal(){document.getElementById('trc-overlay').style.display='none';}
+function saveTrcModal(){
+  const rue=document.getElementById('t-rue').value.trim();
+  const ram=document.getElementById('t-ram').value.trim();
+  if(!rue&&!ram){toast('⚠️ Saisir au moins la rue ou le regard amont');return;}
+  const profilSel=document.getElementById('t-profil').value;
+  const profil=profilSel==='autre'?(document.getElementById('t-profil-autre').value.trim()||'autre'):profilSel;
+  const data={
+    num:document.getElementById('t-num').value.trim()||'T'+(session.troncons.length+1),
+    rue,commune:document.getElementById('t-commune').value.trim(),
+    nature:document.getElementById('t-nature').value,
+    type:document.getElementById('t-type').value,
+    profil,
+    diametre:document.getElementById('t-diam').value.trim(),
+    materiau:document.getElementById('t-materiau').value,
+    section_police:document.getElementById('t-secpol').value.trim(),
+    code_galilee:document.getElementById('t-galilee').value.trim(),
+    longueur:numOrNull(document.getElementById('t-long').value),
+    pente:numOrNull(document.getElementById('t-pente').value),
+    regard_am:ram,regard_av:document.getElementById('t-rav').value.trim(),
+    alt_am:numOrNull(document.getElementById('t-alt-am').value),
+    alt_av:numOrNull(document.getElementById('t-alt-av').value),
+    prof_am:numOrNull(document.getElementById('t-prof-am').value),
+    prof_av:numOrNull(document.getElementById('t-prof-av').value),
+  };
+  if(editTrcId){
+    const t=session.troncons.find(x=>x.id===editTrcId);if(t)Object.assign(t,data);
+    persist();closeTrcModal();renderTroncons();renderVisiteHeader();toast('✅ Tronçon modifié');
+  }else{
+    const newT={...data,id:'trc_'+Date.now(),observations:[],status:'pending',created_at:new Date().toISOString()};
+    session.troncons.push(newT);curTrc=newT.id;
+    persist();closeTrcModal();renderTroncons();renderVisiteHeader();renderObsList();
+    gotoTab('visite');toast('✅ Tronçon créé');
+  }
+}
+
+// ── VISITE HEADER ──
+function renderVisiteHeader(){
+  const hd=document.getElementById('visite-header');
+  if(!curTrc){hd.innerHTML='<div class="empty"><div class="ico">🔍</div><h3>Aucun tronçon sélectionné</h3><p>Choisissez un tronçon dans <strong>🗂️ Tronçons</strong>.</p></div>';return;}
+  const t=session.troncons.find(x=>x.id===curTrc);
+  if(!t){hd.innerHTML='';return;}
+  const idx=session.troncons.indexOf(t);
+  const prev=idx>0?session.troncons[idx-1]:null;
+  const next=idx<session.troncons.length-1?session.troncons[idx+1]:null;
+  hd.innerHTML=`<div class="vhd">
+    <div class="tid">Tronçon ${e(t.num)} · ${t.type==='primaire'?'PRIMAIRE':'Non primaire'} · ${e(t.nature)||'—'}</div>
+    <div class="tname">${e(t.rue)||'Rue non renseignée'}</div>
+    <div class="dets">
+      <span class="det">⬆️ ${e(t.regard_am)||'?'}</span>
+      <span class="det">⬇️ ${e(t.regard_av)||'?'}</span>
+      ${t.longueur!=null?`<span class="det">📏 ${t.longueur}m</span>`:''}
+      ${t.diametre?`<span class="det">⌀ ${e(t.diametre)}</span>`:''}
+      ${t.profil?`<span class="det">${e(t.profil)}</span>`:''}
+      ${t.pente!=null?`<span class="det">∠ ${t.pente}mm/m</span>`:''}
+      ${t.alt_am!=null?`<span class="det">Z am. ${t.alt_am}m</span>`:''}
+      ${t.alt_av!=null?`<span class="det">Z av. ${t.alt_av}m</span>`:''}
+      ${t.prof_am!=null?`<span class="det">P am. ${t.prof_am}m</span>`:''}
+      ${t.prof_av!=null?`<span class="det">P av. ${t.prof_av}m</span>`:''}
+      ${t.commune?`<span class="det">📍 ${e(t.commune)}</span>`:''}
+    </div>
+    <div class="vnav">
+      <button class="vnavbtn" ${!prev?'disabled':''} onclick="${prev?`selectTrc('${prev.id}')`:''}" >◀ Préc.</button>
+      <button class="vnavbtn donebtn" onclick="toggleDone('${t.id}')">${t.status==='done'?'🔵 Rouvrir':'🟢 Terminer'}</button>
+      <button class="vnavbtn" ${!next?'disabled':''} onclick="${next?`selectTrc('${next.id}')`:''}" >Suiv. ▶</button>
+    </div>
+    <button onclick="openTrcModal('${t.id}')" style="margin-top:8px;width:100%;padding:8px;border:1.5px solid rgba(255,255,255,.4);border-radius:6px;background:rgba(255,255,255,.1);color:#fff;font-size:13px;cursor:pointer;">✏️ Modifier les infos de ce tronçon</button>
+  </div>`;
+}
+function toggleDone(id){
+  const t=session.troncons.find(x=>x.id===id);if(!t)return;
+  t.status=t.status==='done'?(t.observations.length?'in_progress':'pending'):'done';
+  persist();renderVisiteHeader();renderTroncons();
+  toast(t.status==='done'?'🟢 Tronçon terminé':'🔵 Tronçon rouvert');
+}
+
+// ── BROUILLON D'OBSERVATION (résiste au rechargement de page pendant la prise de photo) ──
+// Sur Android, ouvrir l'appareil photo via <input capture> peut décharger l'onglet de la
+// mémoire ; à la fermeture de l'appareil photo, la page se recharge et tout l'état JS en
+// cours (photo tout juste prise incluse) est perdu sans erreur visible. On sauvegarde donc
+// un instantané de la modale en cours dans IndexedDB à chaque étape sensible, et on le
+// restaure automatiquement au chargement de la page si un brouillon est trouvé.
+function currentModalState(){
+  return {
+    curTrc,editObs,
+    dist:document.getElementById('o-dist').value,
+    num:document.getElementById('o-num').value,
+    code:document.getElementById('o-code').value,
+    quant:document.getElementById('o-quant').value,
+    note:document.getElementById('o-note').value,
+    zone:selZone,sev:selSev,clock:selClock,gps:selGPS?{...selGPS}:null,
+    equip:selZone==='equip'?buildEquipDetail():null,
+    ouvrage:selZone==='rues'?buildOuvrageDetail():null,
+    photos:[...curPhotos],ts:Date.now()
+  };
+}
+function saveObsDraft(){
+  if(!document.getElementById('overlay').classList.contains('on'))return;
+  idbSet('obsDraft',currentModalState()).catch(()=>{});
+}
+function clearObsDraft(){idbSet('obsDraft',null).catch(()=>{});}
+function restoreObsDraft(draft){
+  if(!draft||!draft.curTrc||!session.troncons.some(t=>t.id===draft.curTrc))return;
+  if(!draft.photos||!draft.photos.length)return; // rien de tangible à récupérer
+  curTrc=draft.curTrc;
+  openModal(draft.editObs||null);
+  editObs=draft.editObs||null;
+  document.getElementById('o-dist').value=draft.dist||'';
+  document.getElementById('o-num').value=draft.num||'';
+  document.getElementById('o-code').value=draft.code||'';
+  document.getElementById('o-quant').value=draft.quant||'';
+  document.getElementById('o-note').value=draft.note||'';
+  if(draft.zone){const b=document.querySelector('.zb.'+draft.zone);if(b)pickZone(draft.zone,b);}
+  if(draft.zone==='equip'&&draft.equip)restoreEquipDetail(draft.equip);
+  if(draft.zone==='rues'&&draft.ouvrage)restoreOuvrageDetail(draft.ouvrage);
+  if(draft.sev){const b=document.querySelector('.sb.s'+draft.sev);if(b)pickSev(draft.sev,b);}
+  if(draft.clock){const b=Array.from(document.querySelectorAll('.cb')).find(x=>x.textContent.trim()===draft.clock);if(b)pickClock(draft.clock,b);}
+  selGPS=draft.gps?{...draft.gps}:null;renderGPS();
+  curPhotos=draft.photos?[...draft.photos]:[];renderPhotoStrip();
+  if(draft.code){renderCodesList('');setTimeout(()=>{const c=document.querySelector(`.chip[data-code="${draft.code}"]`);if(c){c.classList.add('ON');selCode=draft.code;}},50);}
+  renderTroncons();renderVisiteHeader();gotoTab('visite');
+  toast('🔄 Brouillon restauré — '+draft.photos.length+' photo(s) récupérée(s) après reprise');
+}
+
+// ── MODAL OBSERVATION ──
+function openModal(id){
+  if(!curTrc){toast('⚠️ Sélectionnez un tronçon d\'abord');return;}
+  editObs=id||null;
+  document.getElementById('m-title').textContent=id?'Modifier l\'observation':'Nouvelle observation';
+  selZone=null;selCode=null;selSev=null;selClock=null;selGPS=null;
+  ['o-dist','o-num','o-code','o-quant','o-note'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('code-search').value='';
+  document.querySelectorAll('.zb,.chip,.sb,.cb').forEach(b=>b.classList.remove('ON'));
+  renderCodesList('');resetClock();curPhotos=[];renderPhotoStrip();renderGPS();
+  resetEquipPanel();resetOuvragePanel();
+  const trc=session.troncons.find(x=>x.id===curTrc);
+  if(id&&trc){
+    const o=trc.observations.find(x=>x.id===id);
+    if(o){
+      document.getElementById('o-dist').value=o.dist;
+      document.getElementById('o-num').value=o.num||'';
+      document.getElementById('o-code').value=o.code;
+      document.getElementById('o-quant').value=o.quant||'';
+      document.getElementById('o-note').value=o.note||'';
+      if(o.zone){const b=document.querySelector('.zb.'+o.zone);if(b)pickZone(o.zone,b);}
+      if(o.sev){const b=document.querySelector('.sb.s'+o.sev);if(b)pickSev(o.sev,b);}
+      if(o.clock){const b=Array.from(document.querySelectorAll('.cb')).find(b=>b.textContent.trim()===o.clock);if(b)pickClock(o.clock,b);}
+      curPhotos=o.photos?[...o.photos]:[];renderPhotoStrip();
+      selGPS=o.gps?{...o.gps}:null;renderGPS();
+      if(o.code){renderCodesList('');setTimeout(()=>{const c=document.querySelector(`.chip[data-code="${o.code}"]`);if(c){c.classList.add('ON');selCode=o.code;}},50);}
+      if(o.zone==='equip'&&o.equip)restoreEquipDetail(o.equip);
+      if(o.zone==='rues'&&o.ouvrage)restoreOuvrageDetail(o.ouvrage);
+    }
+  }else{if(trc)document.getElementById('o-num').value=trc.observations.length+1;}
+  document.getElementById('overlay').classList.add('on');
+  setTimeout(()=>document.getElementById('o-dist').focus(),200);
+}
+function closeModal(){document.getElementById('overlay').classList.remove('on');clearObsDraft();}
+
+// ── PICKS ──
+function pickZone(z,btn){
+  document.querySelectorAll('.zb').forEach(b=>b.classList.remove('ON'));btn.classList.add('ON');selZone=z;
+  document.getElementById('equip-panel').style.display=z==='equip'?'block':'none';
+  document.getElementById('ouvrage-panel').style.display=z==='rues'?'block':'none';
+  // Code NF optionnel pour équipement ET ouvrage croisé
+  document.getElementById('code-optional-hint').style.display=(z==='equip'||z==='rues')?'block':'none';
+  if(z!=='equip')resetEquipPanel();
+  if(z!=='rues')resetOuvragePanel();
+  if(z==='equip')refreshRegardId();
+}
+function pickSev(s,btn){document.querySelectorAll('.sb').forEach(b=>b.classList.remove('ON'));btn.classList.add('ON');selSev=s;}
+function pickClock(t,btn){
+  document.querySelectorAll('.cb').forEach(b=>b.classList.remove('ON'));btn.classList.add('ON');selClock=t;
+  const[h,m]=t.replace('h',':').split(':').map(Number);
+  const a=((h*60+m)/720)*2*Math.PI;
+  const hand=document.getElementById('c-hand');
+  hand.setAttribute('x2',(40+24*Math.sin(a)).toFixed(1));hand.setAttribute('y2',(40-24*Math.cos(a)).toFixed(1));
+}
+function resetClock(){const h=document.getElementById('c-hand');h.setAttribute('x2','40');h.setAttribute('y2','16');}
+
+// ── ÉQUIPEMENTS (détail zone "equip") ──
+function resetEquipPanel(){
+  document.getElementById('equip-panel').style.display='none';
+  document.getElementById('code-optional-hint').style.display='none';
+  document.getElementById('eq-type').value='';
+  document.querySelectorAll('.eq-detail').forEach(d=>d.style.display='none');
+  document.querySelectorAll('#equip-panel .tgl').forEach(b=>b.classList.remove('ON'));
+  ['eq-diam','eq-dist-prec','eq-nature','eq-police'].forEach(i=>document.getElementById(i).value='');
+}
+function onEquipTypeChange(){
+  const t=document.getElementById('eq-type').value;
+  document.querySelectorAll('.eq-detail').forEach(d=>d.style.display='none');
+  document.querySelectorAll('#equip-panel .tgl').forEach(b=>b.classList.remove('ON'));
+  ['eq-diam','eq-dist-prec','eq-nature','eq-police'].forEach(i=>document.getElementById(i).value='');
+  if(t)document.getElementById('eq-detail-'+t).style.display='block';
+  if(t==='regard')refreshRegardId();
+}
+// Repère R auto = rang du regard courant parmi les regards du tronçon, ordre par distance
+function computeRegardNumber(){
+  const trc=session.troncons.find(x=>x.id===curTrc);
+  if(!trc)return 1;
+  const curDist=numOrNull(document.getElementById('o-dist').value);
+  const regs=trc.observations
+    .filter(o=>o.id!==editObs && o.equip && o.equip.type==='regard')
+    .map(o=>o.dist);
+  if(curDist!=null)regs.push(curDist);
+  regs.sort((a,b)=>a-b);
+  const idx=curDist!=null?regs.indexOf(curDist):regs.length;
+  return (idx<0?regs.length:idx)+1;
+}
+function refreshRegardId(){
+  const el=document.getElementById('eq-regard-id');
+  if(el&&document.getElementById('eq-type').value==='regard')el.textContent='R'+computeRegardNumber();
+}
+function toggleEq(btn){
+  const key=btn.dataset.key;
+  document.querySelectorAll(`.tgl[data-key="${key}"]`).forEach(b=>b.classList.remove('ON'));
+  btn.classList.add('ON');
+}
+function buildEquipDetail(){
+  const type=document.getElementById('eq-type').value;
+  if(!type)return null;
+  const d={type};
+  if(type==='branchement'){
+    d.diam=document.getElementById('eq-diam').value.trim();
+  }else if(type==='regard'){
+    d.police=document.getElementById('eq-police').value.trim();
+    d.distPrec=numOrNull(document.getElementById('eq-dist-prec').value);
+    const b=document.querySelector('.tgl.ON[data-key="travaux"]');
+    d.travaux=b?b.dataset.val==='1':null;
+  }else if(type==='avaloir'){
+    const b=document.querySelector('.tgl.ON[data-key="galerie"]');
+    d.galerie=b?b.dataset.val==='1':null;
+  }else if(type==='bap'){
+    const bp=document.querySelector('.tgl.ON[data-key="poutrelles"]');
+    const br=document.querySelector('.tgl.ON[data-key="rack"]');
+    d.poutrelles=bp?bp.dataset.val==='1':null;
+    d.rack=br?br.dataset.val==='1':null;
+  }else if(type==='vanne'){
+    d.nature=document.getElementById('eq-nature').value.trim();
+  }else if(type==='gradin_escalier'){
+    const b=document.querySelector('.tgl.ON[data-key="sousType"]');
+    d.sousType=b?b.dataset.val:null;
+  }
+  return d;
+}
+function restoreEquipDetail(eq){
+  document.getElementById('eq-type').value=eq.type||'';
+  onEquipTypeChange();
+  const on=(key,val)=>{const b=document.querySelector(`.tgl[data-key="${key}"][data-val="${val}"]`);if(b)toggleEq(b);};
+  if(eq.type==='branchement'){
+    document.getElementById('eq-diam').value=eq.diam||'';
+  }else if(eq.type==='regard'){
+    document.getElementById('eq-police').value=eq.police||'';
+    document.getElementById('eq-dist-prec').value=eq.distPrec??'';
+    if(eq.travaux!=null)on('travaux',eq.travaux?'1':'0');
+    refreshRegardId();
+  }else if(eq.type==='avaloir'){
+    if(eq.galerie!=null)on('galerie',eq.galerie?'1':'0');
+  }else if(eq.type==='bap'){
+    if(eq.poutrelles!=null)on('poutrelles',eq.poutrelles?'1':'0');
+    if(eq.rack!=null)on('rack',eq.rack?'1':'0');
+  }else if(eq.type==='vanne'){
+    document.getElementById('eq-nature').value=eq.nature||'';
+  }else if(eq.type==='gradin_escalier'){
+    if(eq.sousType)on('sousType',eq.sousType);
+  }
+}
+function equipSummaryText(d){
+  if(!d||!d.type)return'';
+  switch(d.type){
+    case'branchement':return'Branchement'+(d.diam?' Ø'+d.diam:'');
+    case'regard':{
+      let s="Regard d'accès";
+      if(d.police)s+=' · N° police '+d.police;
+      if(d.distPrec!=null)s+=' · '+d.distPrec+'m depuis le précédent';
+      if(d.travaux!=null)s+=' · Travaux accès : '+(d.travaux?'Oui':'Non');
+      return s;
+    }
+    case'avaloir':return'Bouche avaloir'+(d.galerie!=null?' · '+(d.galerie?'avec':'sans')+' galerie':'');
+    case'bap':{
+      let s='BAP (barrage à poutrelles)';
+      if(d.poutrelles!=null)s+=' · Poutrelles : '+(d.poutrelles?'Oui':'Non');
+      if(d.rack!=null)s+=' · Rack rangement : '+(d.rack?'Oui':'Non');
+      return s;
+    }
+    case'vanne':return'Vanne'+(d.nature?' — '+d.nature:'');
+    case'gradin_escalier':return d.sousType==='escalier'?'Escalier':(d.sousType==='gradin'?'Gradin':'Gradin / escalier');
+    default:return'';
+  }
+}
+
+// Repère affiché pour une observation regard (R1, R2… selon l'ordre des regards du tronçon)
+function regardLabelFor(trc,obs){
+  if(!obs.equip||obs.equip.type!=='regard')return null;
+  const regs=trc.observations.filter(o=>o.equip&&o.equip.type==='regard').slice().sort((a,b)=>a.dist-b.dist);
+  const idx=regs.findIndex(o=>o.id===obs.id);
+  return 'R'+(idx<0?regs.length:idx+1);
+}
+
+// ── OUVRAGE CROISÉ (détail zone "rues") ──
+function resetOuvragePanel(){
+  document.getElementById('ouvrage-panel').style.display='none';
+  document.getElementById('ov-type').value='';
+  document.querySelectorAll('.ov-detail').forEach(d=>d.style.display='none');
+  ['ov-diam-libre','ov-mat-libre','ov-ovoide'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('ov-diam').value='';document.getElementById('ov-mat').value='';
+  document.getElementById('ov-diam-libre').style.display='none';
+  document.getElementById('ov-mat-libre').style.display='none';
+}
+function onOuvrageTypeChange(){
+  const t=document.getElementById('ov-type').value;
+  document.querySelectorAll('.ov-detail').forEach(d=>d.style.display='none');
+  if(t)document.getElementById('ov-detail-'+t).style.display='block';
+}
+function toggleOvDiamLibre(v){
+  const el=document.getElementById('ov-diam-libre');
+  el.style.display=v==='__libre'?'block':'none';if(v!=='__libre')el.value='';
+}
+function toggleOvMatLibre(v){
+  const el=document.getElementById('ov-mat-libre');
+  el.style.display=v==='__libre'?'block':'none';if(v!=='__libre')el.value='';
+}
+function buildOuvrageDetail(){
+  const type=document.getElementById('ov-type').value;
+  if(!type)return null;
+  const d={type};
+  if(type==='canalisation'){
+    const dv=document.getElementById('ov-diam').value;
+    d.diam=dv==='__libre'?document.getElementById('ov-diam-libre').value.trim():dv;
+    const mv=document.getElementById('ov-mat').value;
+    d.materiau=mv==='__libre'?document.getElementById('ov-mat-libre').value.trim():mv;
+  }else if(type==='ovoide'){
+    d.desc=document.getElementById('ov-ovoide').value.trim();
+  }
+  return d;
+}
+function restoreOuvrageDetail(o){
+  document.getElementById('ov-type').value=o.type||'';
+  onOuvrageTypeChange();
+  if(o.type==='canalisation'){
+    const std=['200','300','400','500','600','700','800','900','1000'];
+    if(o.diam&&std.includes(String(o.diam))){document.getElementById('ov-diam').value=o.diam;}
+    else if(o.diam){document.getElementById('ov-diam').value='__libre';document.getElementById('ov-diam-libre').style.display='block';document.getElementById('ov-diam-libre').value=o.diam;}
+    const stdM=['Grès','Béton','PVC','Fibrociment'];
+    if(o.materiau&&stdM.includes(o.materiau)){document.getElementById('ov-mat').value=o.materiau;}
+    else if(o.materiau){document.getElementById('ov-mat').value='__libre';document.getElementById('ov-mat-libre').style.display='block';document.getElementById('ov-mat-libre').value=o.materiau;}
+  }else if(o.type==='ovoide'){
+    document.getElementById('ov-ovoide').value=o.desc||'';
+  }
+}
+function ouvrageSummaryText(d){
+  if(!d||!d.type)return'';
+  if(d.type==='canalisation'){
+    let s='Ouvrage croisé : Canalisation';
+    if(d.diam)s+=' Ø'+d.diam;
+    if(d.materiau)s+=' — '+d.materiau;
+    return s;
+  }
+  if(d.type==='ovoide')return'Ouvrage croisé : Ovoïde'+(d.desc?' — '+d.desc:'');
+  return'Ouvrage croisé';
+}
+
+// ── GPS ──
+function renderGPS(){
+  const info=document.getElementById('gps-info');
+  const clr=document.getElementById('gps-clear');
+  if(selGPS){
+    info.textContent=selGPS.lat.toFixed(6)+', '+selGPS.lng.toFixed(6)+(selGPS.acc!=null?' (±'+Math.round(selGPS.acc)+' m)':'');
+    info.style.color='var(--grn)';clr.style.display='block';
+  }else{
+    info.textContent='Aucune position enregistrée';info.style.color='var(--muted)';clr.style.display='none';
+  }
+}
+function clearGPS(){selGPS=null;renderGPS();}
+function captureGPS(){
+  if(!navigator.geolocation){toast('⚠️ GPS non disponible sur cet appareil');return;}
+  const btn=document.getElementById('gps-btn');
+  btn.disabled=true;btn.textContent='📡 Recherche…';
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      selGPS={lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy};
+      renderGPS();btn.disabled=false;btn.textContent='📍 Capturer';
+      toast('📍 Position enregistrée (±'+Math.round(p.coords.accuracy)+' m)');
+    },
+    err=>{
+      btn.disabled=false;btn.textContent='📍 Capturer';
+      const msgs={1:'Autorisation refusée — vérifier les permissions',2:'Position indisponible (pas de signal GPS)',3:'Délai dépassé — réessayer à l\'air libre'};
+      toast('⚠️ GPS : '+(msgs[err.code]||err.message));
+    },
+    {enableHighAccuracy:true,timeout:20000,maximumAge:30000}
+  );
+}
+
+// ── CODES ──
+function renderCodesList(q){
+  const lq=q.toLowerCase();const groups={};
+  CODES.filter(c=>!lq||c.code.toLowerCase().includes(lq)||c.desc.toLowerCase().includes(lq)||c.g.toLowerCase().includes(lq))
+    .forEach(c=>{(groups[c.g]=groups[c.g]||[]).push(c);});
+  let html='';
+  Object.entries(groups).forEach(([g,items])=>{
+    html+=`<span class="cat-lbl">${g}</span><div class="chips">`;
+    items.forEach(c=>{
+      html+=`<button class="chip ${c.cls} ${selCode===c.code?'ON':''}" data-code="${c.code}" onclick="pickChip('${c.code}',this)">
+        <span class="cid">${c.code}</span><span class="cdesc">${c.desc}</span></button>`;
+    });html+='</div>';
+  });
+  if(!html)html='<div style="text-align:center;color:#bbb;padding:16px;font-size:13px;">Aucun code trouvé</div>';
+  document.getElementById('codes-box').innerHTML=html;
+}
+function filterCodes(){renderCodesList(document.getElementById('code-search').value);}
+function pickChip(code,btn){
+  document.querySelectorAll('.chip').forEach(b=>b.classList.remove('ON'));
+  btn.classList.add('ON');selCode=code;document.getElementById('o-code').value=code;
+}
+
+// Classement structurel/fonctionnel d'un code (BA_ = structurel)
+function isStructural(code){return /^BA/.test(String(code).replace(/\s/g,''));}
+
+// ── SAVE OBS ──
+function saveObs(){
+  const trc=session.troncons.find(x=>x.id===curTrc);
+  if(!trc){toast('⚠️ Aucun tronçon');return;}
+  const dist=numOrNull(document.getElementById('o-dist').value);
+  const code=(document.getElementById('o-code').value.toUpperCase().trim())||selCode;
+  if(dist==null){toast('⚠️ Saisir une distance');return;}
+  const codeOptional=(selZone==='equip'||selZone==='rues');
+  if(!code&&!codeOptional){toast('⚠️ Sélectionner ou saisir un code');return;}
+  if(trc.longueur!=null&&dist>trc.longueur+5){
+    if(!confirm('⚠️ Distance '+dist+' m > longueur du tronçon ('+trc.longueur+' m).\nEnregistrer quand même ?'))return;
+  }
+  const ce=CODES.find(c=>c.code===code);
+  const equip=selZone==='equip'?buildEquipDetail():null;
+  const ouvrage=selZone==='rues'?buildOuvrageDetail():null;
+  const extra=equip?equipSummaryText(equip):(ouvrage?ouvrageSummaryText(ouvrage):'');
+  let desc=ce?ce.desc:'';
+  if(extra)desc=desc?(desc+' · '+extra):extra;
+  const obs={id:editObs||Date.now().toString(),dist,
+    num:document.getElementById('o-num').value||null,zone:selZone,code,
+    desc,sev:selSev,clock:selClock,
+    quant:document.getElementById('o-quant').value,
+    note:document.getElementById('o-note').value,
+    gps:selGPS?{...selGPS}:null,
+    equip,ouvrage,
+    photos:[...curPhotos],ts:new Date().toISOString()};
+  if(editObs){const i=trc.observations.findIndex(o=>o.id===editObs);if(i!==-1)trc.observations[i]=obs;}
+  else{trc.observations.push(obs);}
+  trc.observations.sort((a,b)=>a.dist-b.dist);
+  if(trc.status==='pending')trc.status='in_progress';
+  persist();renderObsList();closeModal();toast('✅ Observation enregistrée');
+}
+
+// ── RENDER OBS ──
+function renderObsList(){
+  const list=document.getElementById('obs-list');
+  const trc=curTrc?session.troncons.find(x=>x.id===curTrc):null;
+  if(!trc){list.innerHTML='';return;}
+  if(!trc.observations.length){
+    list.innerHTML='<div class="empty"><div class="ico">🔎</div><h3>Aucune observation</h3><p>Appuyez sur <strong>+ Observation</strong>.</p></div>';return;
+  }
+  list.innerHTML=trc.observations.map(o=>{
+    const z=ZONES[o.zone]||{label:'—',cls:''};
+    const rid=regardLabelFor(trc,o);
+    return `<div class="obs-item" onclick="openModal('${o.id}')">
+      <div class="obs-dist">${o.dist}<small>m${rid?'<br>'+rid:(o.num?'<br>#'+e(o.num):'')}</small></div>
+      <div class="obs-body">
+        <div class="obs-code">
+          ${rid?`<span style="font-weight:800;color:var(--bdk);">${rid}</span>`:''}
+          <span style="font-family:monospace">${e(o.code)}</span>
+          <span class="badge ${z.cls}">${z.label}</span>
+          ${o.clock?`<span style="font-size:11px;color:#999;">${e(o.clock)}</span>`:''}
+          ${o.sev?`<span style="color:${SVC[o.sev]};font-size:14px;">${SVL[o.sev]}</span>`:''}
+          ${o.gps?'<span style="font-size:12px;">📍</span>':''}
+        </div>
+        <div class="obs-desc">${e(o.desc)||'—'}${o.quant?' · <em>'+e(o.quant)+'</em>':''}</div>
+        ${o.note?`<div class="obs-note">${e(o.note)}</div>`:''}
+        ${o.photos&&o.photos.length?`<div class="obs-photos">
+          ${o.photos.slice(0,MAX_PH).map((p,i)=>`<img class="obs-photo-thumb" src="${p}" onclick="event.stopPropagation();viewPhotoObs('${trc.id}','${o.id}',${i})" alt="">`).join('')}
+          <span class="photo-badge">📷 ${o.photos.length}</span></div>`:''}
+      </div>
+      <button class="del-btn" onclick="delObs('${o.id}',event)">✕</button>
+    </div>`;
+  }).join('');
+}
+function delObs(id,evt){
+  evt.stopPropagation();if(!confirm('Supprimer cette observation ?'))return;
+  const trc=session.troncons.find(x=>x.id===curTrc);
+  if(!trc)return;trc.observations=trc.observations.filter(o=>o.id!==id);
+  persist();renderObsList();toast('🗑️ Supprimée');
+}
+
+// ── PHOTOS ──
+function compressImage(file,cb,errCb){
+  const r=new FileReader();
+  r.onerror=()=>errCb&&errCb();
+  r.onload=e2=>{
+    const img=new Image();
+    img.onerror=()=>errCb&&errCb();
+    img.onload=()=>{
+      try{
+        const ratio=Math.min(MAX_PX/Math.max(img.width,img.height),1);
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.round(img.width*ratio);canvas.height=Math.round(img.height*ratio);
+        canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+        cb(canvas.toDataURL('image/jpeg',QUAL));
+      }catch(_){errCb&&errCb();}
+    };
+    img.src=e2.target.result;
+  };
+  r.readAsDataURL(file);
+}
+function handlePhotoInput(evt){
+  const files=Array.from(evt.target.files);evt.target.value='';
+  document.getElementById('photo-camera').value='';document.getElementById('photo-gallery').value='';
+  if(!files.length)return;
+  if(curPhotos.length>=MAX_PH){toast(`⚠️ Maximum ${MAX_PH} photos`);return;}
+  const slots=MAX_PH-curPhotos.length;const toProcess=files.slice(0,slots);
+  if(files.length>slots)toast(`⚠️ ${slots} emplacement(s) disponible(s)`);
+  let done=0,fail=0;
+  const fin=()=>{if(done+fail===toProcess.length){renderPhotoStrip();
+    if(done){toast(`📷 ${done} photo(s) ajoutée(s)`+(fail?` · ${fail} en échec`:''));saveObsDraft();}
+    else toast('❌ Photo(s) illisible(s)');}};
+  toProcess.forEach(f=>compressImage(f,d=>{curPhotos.push(d);done++;fin();},()=>{fail++;fin();}));
+}
+function renderPhotoStrip(){
+  const strip=document.getElementById('photo-strip');const note=document.getElementById('photo-note');
+  if(!strip)return;
+  if(!curPhotos.length){strip.innerHTML='';note.textContent=`Max ${MAX_PH} photos · Compressées automatiquement`;return;}
+  strip.innerHTML=curPhotos.map((p,i)=>`<div class="photo-thumb"><img src="${p}" alt="" onclick="viewPhotoModal(${i})"><button class="photo-del" onclick="event.stopPropagation();rmPhoto(${i})">✕</button></div>`).join('');
+  note.textContent=`${curPhotos.length}/${MAX_PH} photo(s) · Appuyer pour agrandir`;
+}
+function rmPhoto(i){curPhotos.splice(i,1);renderPhotoStrip();toast('🗑️ Photo supprimée');}
+
+// ── LIGHTBOX ──
+function viewPhotoModal(idx){openLB(curPhotos,idx,'Photo');}
+function viewPhotoObs(trcId,obsId,idx){
+  const trc=session.troncons.find(t=>t.id===trcId);
+  const obs=trc&&trc.observations.find(o=>o.id===obsId);
+  if(obs&&obs.photos)openLB(obs.photos,idx,obs.code+' — '+obs.dist+'m');
+}
+let lbLabel='';
+function openLB(photos,idx,label){
+  lbPhotos=photos;lbIdx=idx;lbLabel=label;
+  document.getElementById('lb-img').src=photos[idx];
+  document.getElementById('lb-caption').textContent=label+' — '+(idx+1)+'/'+photos.length;
+  document.getElementById('lb-prev').style.display=photos.length>1?'flex':'none';
+  document.getElementById('lb-next').style.display=photos.length>1?'flex':'none';
+  document.getElementById('lightbox').classList.add('on');
+}
+function lbNav(dir){
+  if(!lbPhotos.length)return;
+  lbIdx=(lbIdx+dir+lbPhotos.length)%lbPhotos.length;
+  document.getElementById('lb-img').src=lbPhotos[lbIdx];
+  document.getElementById('lb-caption').textContent=lbLabel+' — '+(lbIdx+1)+'/'+lbPhotos.length;
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('on');setTimeout(()=>{document.getElementById('lb-img').src='';},300);}
+
+// ── STATS ──
+function updateStats(){
+  const allObs=session.troncons.flatMap(t=>t.observations);
+  document.getElementById('st-trc').textContent=session.troncons.length;
+  document.getElementById('st-done').textContent=session.troncons.filter(t=>t.status==='done').length;
+  document.getElementById('st-tot').textContent=allObs.length;
+  document.getElementById('st-b').textContent=allObs.filter(o=>isStructural(o.code)).length;
+  document.getElementById('st-c').textContent=allObs.filter(o=>!isStructural(o.code)).length;
+  document.getElementById('st-crit').textContent=allObs.filter(o=>o.sev>=3).length;
+  document.getElementById('st-photos').textContent=allObs.reduce((s,o)=>s+(o.photos?o.photos.length:0),0);
+  document.getElementById('st-gps').textContent=allObs.filter(o=>o.gps).length;
+}
+
+// ── EXPORT ──
+function stamp(){return (session.date||'session')+'_'+new Date().toISOString().slice(11,16).replace(':','h');}
+function exportJSON(){
+  const b=new Blob([JSON.stringify({version:2,session,exportDate:new Date().toISOString()},null,2)],{type:'application/json'});
+  dl(b,'releve_DEA93_'+stamp()+'.json');toast('📥 JSON téléchargé');
+}
+function exportCSV(){
+  const hdr=['Tronçon','Rue','Commune','Rg amont','Rg aval','N°','Distance(m)','Zone','Code','Description','Importance','Position','Quantification','Remarques','Latitude','Longitude','Précision(m)','Nb photos'];
+  const rows=session.troncons.flatMap(t=>t.observations.map(o=>[
+    t.num,t.rue||'',t.commune||'',t.regard_am||'',t.regard_av||'',o.num||'',o.dist,
+    ZONES[o.zone]?.label||'',o.code,o.desc||'',
+    o.sev||'',o.clock||'',o.quant||'',o.note||'',
+    o.gps?o.gps.lat:'',o.gps?o.gps.lng:'',o.gps&&o.gps.acc!=null?Math.round(o.gps.acc):'',
+    o.photos?o.photos.length:0
+  ].map(csvCell).join(',')));
+  const csv=['# Relevé DEA 93 — NF EN 13508-2 — '+(session.date||''),
+    '# Atlas: '+(session.atlas||'saisie manuelle'),'',hdr.map(csvCell).join(','),...rows].join('\r\n');
+  const b=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  dl(b,'releve_DEA93_'+stamp()+'.csv');toast('📊 CSV téléchargé');
+}
+function exportGeoJSON(){
+  const feats=[];let missing=0;
+  session.troncons.forEach(t=>t.observations.forEach(o=>{
+    if(o.gps){
+      feats.push({type:'Feature',
+        geometry:{type:'Point',coordinates:[o.gps.lng,o.gps.lat]},
+        properties:{
+          troncon:t.num,rue:t.rue||'',commune:t.commune||'',nature:t.nature||'',
+          regard_amont:t.regard_am||'',regard_aval:t.regard_av||'',
+          distance_m:o.dist,zone:ZONES[o.zone]?.label||'',code:o.code,
+          description:o.desc||'',importance:o.sev||null,position_horaire:o.clock||'',
+          quantification:o.quant||'',remarques:o.note||'',
+          precision_gps_m:o.gps.acc!=null?Math.round(o.gps.acc):null,
+          date:session.date||''
+        }});
+    }else missing++;
+  }));
+  if(!feats.length){toast('⚠️ Aucune observation géolocalisée (bouton 📍 dans l\'observation)');return;}
+  const b=new Blob([JSON.stringify({type:'FeatureCollection',
+    crs:{type:'name',properties:{name:'urn:ogc:def:crs:OGC:1.3:CRS84'}},features:feats},null,2)],
+    {type:'application/geo+json'});
+  dl(b,'releve_DEA93_'+stamp()+'.geojson');
+  toast('🗺️ GeoJSON : '+feats.length+' point(s)'+(missing?' · '+missing+' obs. sans GPS':''));
+}
+function dl(blob,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+
+// ── IMPORT JSON (session complète OU réponse Claude {"troncons":[...]}) ──
+function loadJSONSession(evt){
+  const files=evt.target?evt.target.files:(evt.dataTransfer?evt.dataTransfer.files:null);
+  const f=files&&files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      let raw=String(ev.target.result).trim();
+      // Tolérance : réponse Claude entourée de ```json ... ```
+      raw=raw.replace(/^```(json)?/i,'').replace(/```$/,'').trim();
+      const d=JSON.parse(raw);
+      if(d.session&&Array.isArray(d.session.troncons)){
+        // Sauvegarde complète
+        if(!confirm('Charger la sauvegarde "'+f.name+'" — '+d.session.troncons.length+' tronçon(s) ?\nLes données actuelles seront remplacées.'))return;
+        session=d.session;
+        if(!session.version)session.version=2;
+        curTrc=null;
+        persist();renderTroncons();renderVisiteHeader();renderObsList();updateStats();
+        gotoTab('troncons');
+        toast('✅ Session chargée ('+session.troncons.length+' tronçons)');
+      }else if(Array.isArray(d.troncons)){
+        // Réponse de l'analyse d'atlas → table de validation
+        pending=d.troncons.map(t=>({
+          num:t.num||'',rue:t.rue||'',commune:t.commune||'',
+          regard_am:t.regard_am||'',regard_av:t.regard_av||'',
+          longueur:numOrNull(t.longueur),diametre:t.diametre!=null?String(t.diametre):'',
+          profil:t.profil||'ovoïde',nature:t.nature||'EU',type:t.type||'non_primaire',
+          alt_am:numOrNull(t.alt_am),alt_av:numOrNull(t.alt_av),
+          prof_am:numOrNull(t.prof_am),prof_av:numOrNull(t.prof_av),pente:numOrNull(t.pente)
+        }));
+        session.atlas=f.name;
+        renderVTable(pending);
+        document.getElementById('atlas-result').style.display='block';
+        gotoTab('atlas');
+        toast('✅ '+pending.length+' tronçons extraits — vérifiez puis générez');
+      }else{
+        throw new Error('Structure non reconnue (ni session, ni liste de tronçons)');
+      }
+    }catch(err){toast('❌ Fichier invalide : '+err.message);}
+  };
+  r.onerror=()=>toast('❌ Lecture du fichier impossible');
+  r.readAsText(f);
+  if(evt.target)evt.target.value='';
+}
+
+function clearAll(){
+  if(!confirm('Effacer TOUTES les données ? Action irréversible.'))return;
+  if(!confirm('Dernière confirmation : avez-vous exporté le JSON de sauvegarde ?\n\nOK = tout effacer définitivement.'))return;
+  idbClear().catch(()=>{});
+  try{localStorage.removeItem('dea_s');localStorage.removeItem('dea_ct');}catch(_){}
+  setTimeout(()=>location.reload(),200);
+}
+
+// ── RAPPORT IMPRIMABLE ──
+function fRow(k,v){return v!=null&&v!==''?`<td class="k">${k}</td><td>${v}</td>`:`<td class="k">${k}</td><td>—</td>`;}
+function buildReport(){
+  const allObs=session.troncons.flatMap(t=>t.observations);
+  let html=`<h1>Relevé Égout Visitable — DEA Seine-Saint-Denis (93)</h1>
+  <div class="rpt-meta-doc">
+    Codification NF EN 13508-2 · Date de session : <strong>${e(session.date)||'—'}</strong>
+    · Atlas : ${e(session.atlas)||'saisie manuelle'}
+    · ${session.troncons.length} tronçon(s), ${allObs.length} observation(s)
+    · Édité le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}
+  </div>`;
+  session.troncons.forEach(t=>{
+    const stLbl=t.status==='done'?'🟢 Terminé':t.observations.length?'🟡 En cours':'🔵 En attente';
+    html+=`<div class="rpt-trc">
+    <h2>Tronçon ${e(t.num)} — ${e(t.rue)||'rue non renseignée'}${t.commune?' ('+e(t.commune)+')':''}</h2>
+    <table class="rpt-fiche">
+      <tr>${fRow('Nature',e(t.nature))}${fRow('Type',t.type==='primaire'?'Primaire':'Non primaire')}${fRow('Profil',e(t.profil))}${fRow('Ø / gabarit',e(t.diametre))}</tr>
+      <tr>${fRow('Longueur (m)',t.longueur)}${fRow('Pente (mm/m)',t.pente)}${fRow('Statut',stLbl)}${fRow('Observations',t.observations.length)}</tr>
+      <tr>${fRow('Regard amont',e(t.regard_am))}${fRow('Alt. am. (m NGF)',t.alt_am)}${fRow('Prof. am. (m)',t.prof_am)}<td class="k"></td><td></td></tr>
+      <tr>${fRow('Regard aval',e(t.regard_av))}${fRow('Alt. av. (m NGF)',t.alt_av)}${fRow('Prof. av. (m)',t.prof_av)}<td class="k"></td><td></td></tr>
+    </table>`;
+    if(!t.observations.length){
+      html+='<div class="rpt-empty">Aucune observation relevée sur ce tronçon.</div>';
+    }else{
+      html+=`<table class="rpt-obs"><thead><tr>
+        <th>N°</th><th>Dist. (m)</th><th>Zone</th><th>Code</th><th>Description</th>
+        <th>Imp.</th><th>Pos.</th><th>Quantification</th><th>Remarques</th><th>GPS</th>
+      </tr></thead><tbody>`;
+      t.observations.forEach(o=>{
+        html+=`<tr>
+          <td>${e(o.num)||''}</td><td><strong>${o.dist}</strong></td>
+          <td>${ZONES[o.zone]?.label||''}</td>
+          <td style="font-family:monospace;font-weight:700;">${e(o.code)}</td>
+          <td>${e(o.desc)}</td>
+          <td style="text-align:center;">${o.sev||''}</td>
+          <td>${e(o.clock)||''}</td>
+          <td>${e(o.quant)||''}</td>
+          <td>${e(o.note)||''}</td>
+          <td style="font-size:8.5px;">${o.gps?o.gps.lat.toFixed(5)+'<br>'+o.gps.lng.toFixed(5):''}</td>
+        </tr>`;
+      });
+      html+='</tbody></table>';
+      const withPhotos=t.observations.filter(o=>o.photos&&o.photos.length);
+      if(withPhotos.length){
+        html+='<div class="rpt-photos">';
+        withPhotos.forEach(o=>{
+          html+=`<div class="cap">📷 Obs. ${e(o.num)||''} — ${o.dist} m — ${e(o.code)}</div>`;
+          o.photos.forEach(p=>{html+=`<img src="${p}" alt="">`;});
+        });
+        html+='</div>';
+      }
+    }
+    html+='</div>';
+  });
+  document.getElementById('report').innerHTML=html;
+}
+function printReport(){
+  if(!session.troncons.length){toast('⚠️ Aucun tronçon à imprimer');return;}
+  buildReport();
+  setTimeout(()=>window.print(),150);
+}
+
+// ════════════════════════════════════════
+//  FEUILLE DE VISITE (modèle officiel DEA 93) — export PDF
+// ════════════════════════════════════════
+const SCHEMA_ROWS=[
+  {key:'prof',label:'Profondeur (m)'},
+  {key:'equip',label:'Équipements'},
+  {key:'vg',label:'½ Voûte gauche'},
+  {key:'pg',label:'Piédroit gauche'},
+  {key:'rad',label:'Radier'},
+  {key:'pd',label:'Piédroit droit'},
+  {key:'vd',label:'½ Voûte droite'},
+  {key:'eau',label:'Ensablement / Eau'},
+  {key:'rues',label:'Rues croisées / OA'},
+];
+function equipTag(eq,trc,o){
+  if(!eq)return'•';
+  switch(eq.type){
+    case'regard':return regardLabelFor(trc,o)||'Rg';
+    case'branchement':return'Br';
+    case'vanne':return'V';
+    case'bap':return'BAP';
+    case'avaloir':return'Av';
+    case'gradin_escalier':return eq.sousType==='escalier'?'Esc':'Gra';
+    default:return'•';
+  }
+}
+function isEauCode(code){return /^(BBC|BBD|BDD)/.test(String(code).replace(/\s/g,''));}
+function fmtNum(n){return Number.isInteger(n)?String(n):String(Math.round(n*10)/10);}
+
+function buildFeuilleDoc(){
+  const COLS=10;
+  const css=`
+  :root{color-scheme:light;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  @page{size:A4 landscape;margin:7mm;}
+  html,body{background:#fff !important;}
+  body{font-family:Arial,Helvetica,sans-serif;color:#111;font-size:9pt;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .sheet{width:100%;background:#fff;page-break-after:always;display:flex;flex-direction:column;gap:2mm;}
+  .sheet:last-child{page-break-after:auto;}
+  .cell-lbl{font-size:6.3pt;font-weight:700;color:#1b3c77;text-transform:uppercase;line-height:1.05;}
+  .cell-val{font-size:9pt;font-weight:700;color:#111;min-height:12px;word-break:break-word;}
+  table{border-collapse:collapse;width:100%;}
+  .head{display:flex;gap:2mm;align-items:stretch;}
+  .titleblock{flex:0 0 52mm;border:1.4px solid #1b3c77;border-radius:3px;overflow:hidden;display:flex;flex-direction:column;}
+  .titleblock .t1{background:#1b3c77;color:#fff;padding:3px 6px;}
+  .titleblock .t1 b{font-size:12.5pt;font-weight:800;letter-spacing:.5px;display:block;line-height:1.1;}
+  .titleblock .t1 span{font-size:6.5pt;opacity:.9;}
+  .titleblock .t2{display:flex;justify-content:space-between;align-items:center;padding:3px 6px;flex:1;}
+  .titleblock .t2 .norm{font-size:7.5pt;font-weight:700;color:#1b3c77;}
+  .titleblock .t2 .dea{font-size:12pt;font-weight:800;color:#c0392b;border:1.6px solid #c0392b;border-radius:3px;padding:1px 7px;}
+  .meta{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr 30mm;grid-template-rows:1fr 1fr;border:1.4px solid #1b3c77;border-radius:3px;overflow:hidden;}
+  .meta .m{border-right:1px solid #b9c8dd;border-bottom:1px solid #b9c8dd;padding:2px 6px 3px;}
+  .meta .m:nth-child(4n){border-right:none;}
+  .meta .m:nth-child(n+5){border-bottom:none;}
+  .band{display:grid;grid-template-columns:24mm 32mm 32mm 26mm 44mm 34mm 1fr;border:1.4px solid #1b3c77;border-radius:3px;overflow:hidden;}
+  .band .b{border-right:1px solid #b9c8dd;padding:2px 6px 3px;}
+  .band .b:last-child{border-right:none;}
+  .flowbox{display:flex;align-items:center;gap:4px;font-size:8.5pt;font-weight:700;color:#1b3c77;}
+  .flowbox .ar{font-size:11pt;color:#c0392b;}
+  .schema{border:1.4px solid #1b3c77;border-radius:3px;overflow:hidden;}
+  .schema table{table-layout:fixed;}
+  .schema th,.schema td{border:1px solid #c3d0e2;font-size:6.4pt;text-align:center;height:14px;overflow:hidden;}
+  .schema .rowlbl{width:26mm;text-align:left;padding-left:5px;font-weight:700;color:#1b3c77;font-size:6.6pt;background:#eef3fa;}
+  .schema .disthead{background:#1b3c77;color:#fff;font-weight:700;font-size:6.2pt;height:15px;}
+  .schema .disthead .rowlbl{background:#1b3c77;color:#fff;}
+  .schema .tickrow td{background:#f4f7fb;color:#555;font-size:5.6pt;height:10px;border-bottom:1.4px solid #1b3c77;}
+  .schema .mark{background:#1b3c77;color:#fff;font-weight:800;font-size:6.4pt;}
+  .schema .zebra td:not(.rowlbl){background:#f8fbff;}
+  .obs-title{background:#1b3c77;color:#fff;padding:3px 8px;border-radius:3px 3px 0 0;display:flex;justify-content:space-between;align-items:baseline;}
+  .obs-title b{font-size:8.5pt;}.obs-title span{font-size:6.2pt;opacity:.85;}
+  .obs{border:1.4px solid #1b3c77;border-top:none;border-radius:0 0 3px 3px;overflow:hidden;}
+  .obs table{table-layout:fixed;}
+  .obs th{background:#2a5299;color:#fff;font-size:6.5pt;padding:3px 4px;border:1px solid #1b3c77;text-transform:uppercase;line-height:1.05;}
+  .obs td{border:1px solid #c3d0e2;font-size:8pt;padding:2px 5px;height:16px;vertical-align:middle;word-break:break-word;}
+  .obs td.c{text-align:center;}
+  .obs td.code{font-family:'Courier New',monospace;font-weight:700;text-align:center;}
+  .obs tr:nth-child(even) td{background:#f6f9fd;}
+  .obs .rid{font-weight:800;color:#1b3c77;}
+  .foot{display:grid;grid-template-columns:1fr 1fr 1.3fr 42mm;gap:2mm;margin-top:auto;}
+  .sig{border:1.2px solid #1b3c77;border-radius:3px;min-height:15mm;padding:2px 6px;}
+  .deabox{border:1.2px solid #1b3c77;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3px;}
+  .deabox .big{font-size:12pt;font-weight:800;color:#1b3c77;letter-spacing:3px;}
+  .deabox small{font-size:6pt;color:#333;line-height:1.25;}
+  .annex{background:#fff;page-break-after:always;padding:2mm;}
+  .annex:last-child{page-break-after:auto;}
+  .annex h2{font-size:11pt;color:#1b3c77;border-bottom:2px solid #1b3c77;padding-bottom:4px;margin-bottom:8px;}
+  .annex .grid{display:flex;flex-wrap:wrap;gap:6px;}
+  .annex figure{width:64mm;border:1px solid #999;border-radius:3px;overflow:hidden;break-inside:avoid;}
+  .annex img{width:100%;height:44mm;object-fit:cover;display:block;}
+  .annex figcaption{font-size:8pt;padding:3px 5px;background:#eef3fa;color:#1b3c77;font-weight:700;}
+  `;
+  const total=session.troncons.length;
+  let body='';
+  session.troncons.forEach((trc,i)=>{ body+=buildOneFeuille(trc,i+1,total,COLS); });
+  return '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="color-scheme" content="light"><title>Feuilles de visite — DEA 93</title><style>'+css+'</style></head><body>'+body+'</body></html>';
+}
+
+function buildOneFeuille(trc,noFeuille,total,COLS){
+  const obsSorted=trc.observations.slice().sort((a,b)=>a.dist-b.dist);
+  // numérotation des photos pour ce tronçon
+  const photoMap=[];let pc=0;const annexPhotos=[];
+  obsSorted.forEach(o=>{
+    const nums=[];
+    (o.photos||[]).forEach(p=>{pc++;nums.push('P'+pc);annexPhotos.push({n:'P'+pc,src:p,cap:(regardLabelFor(trc,o)?regardLabelFor(trc,o)+' · ':'')+o.dist+'m · '+(o.code||o.zone||'')});});
+    photoMap.push(nums.join('–'));
+  });
+  const L=(trc.longueur&&trc.longueur>0)?trc.longueur:(obsSorted.length?Math.max(50,Math.ceil(Math.max(...obsSorted.map(o=>o.dist))/5)*5):50);
+  const step=L/COLS;
+  const colOf=d=>Math.min(COLS-1,Math.max(0,Math.floor(d/step)));
+  // remplir la grille schéma
+  const grid={};SCHEMA_ROWS.forEach(r=>grid[r.key]=Array(COLS).fill(''));
+  obsSorted.forEach(o=>{
+    const c=colOf(o.dist);
+    const rowKey=({vg:'vg',vd:'vd',pg:'pg',pd:'pd',rad:'rad',equip:'equip',rues:'rues'})[o.zone];
+    if(rowKey==='equip'){const t=equipTag(o.equip,trc,o);grid.equip[c]=grid.equip[c]?grid.equip[c]+' '+t:t;}
+    else if(rowKey){grid[rowKey][c]='•';}
+    if(isEauCode(o.code))grid.eau[c]='•';
+  });
+  if(trc.prof_am!=null)grid.prof[0]=fmtNum(trc.prof_am);
+  if(trc.prof_av!=null)grid.prof[COLS-1]=fmtNum(trc.prof_av);
+  // en-têtes colonnes
+  let distHead='';let tickRow='';
+  for(let i=0;i<COLS;i++){
+    const a=fmtNum(i*step),b=fmtNum((i+1)*step);
+    distHead+=`<th>${a}–${b}</th>`;
+    tickRow+=`<td>${fmtNum(i*step)}m</td>`;
+  }
+  // lignes schéma
+  let schemaRows='';
+  SCHEMA_ROWS.forEach((r,ri)=>{
+    let cells='';
+    for(let i=0;i<COLS;i++){const v=grid[r.key][i];cells+=v?`<td class="mark">${e(v)}</td>`:'<td></td>';}
+    schemaRows+=`<tr class="${ri%2?'zebra':''}"><td class="rowlbl">${r.label}</td>${cells}</tr>`;
+  });
+  // section/dimensions
+  const section=[trc.profil,trc.diametre].filter(Boolean).join(' ');
+  // tableau observations
+  let obsRows='';
+  obsSorted.forEach((o,idx)=>{
+    const rid=regardLabelFor(trc,o);
+    const z=ZONES[o.zone]||{label:''};
+    const sev=o.sev?String(o.sev):'';
+    const sevColor=o.sev>=3?'#c0392b':(o.sev===2?'#e67e22':'#1e7e34');
+    obsRows+=`<tr>
+      <td class="c ${rid?'rid':''}">${rid?e(rid)+' · ':''}${o.dist}</td>
+      <td class="code">${e(o.code)||'—'}</td>
+      <td>${e(o.desc)||'—'}${o.quant?' · '+e(o.quant):''}${o.note?' — '+e(o.note):''}</td>
+      <td class="c">${e(z.label)}</td>
+      <td class="c" style="font-weight:800;color:${sevColor};">${sev||'—'}</td>
+      <td class="c">${photoMap[idx]||'—'}</td>
+    </tr>`;
+  });
+  // 2 lignes vierges pour annotations manuelles
+  for(let k=0;k<2;k++)obsRows+='<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>';
+
+  const sheet=`<div class="sheet">
+    <div class="head">
+      <div class="titleblock">
+        <div class="t1"><b>FEUILLE DE VISITE</b><span>INSPECTION VISUELLE · RÉSEAU D'ASSAINISSEMENT</span></div>
+        <div class="t2"><span class="norm">NF EN 13508-2</span><span class="dea">DEA 93</span></div>
+      </div>
+      <div class="meta">
+        <div class="m"><div class="cell-lbl">Commune</div><div class="cell-val">${e(trc.commune)||'—'}</div></div>
+        <div class="m"><div class="cell-lbl">Rue / Voie</div><div class="cell-val">${e(trc.rue)||'—'}</div></div>
+        <div class="m"><div class="cell-lbl">Opérateur</div><div class="cell-val">${e(session.operateur)||'—'}</div></div>
+        <div class="m"><div class="cell-lbl">Date</div><div class="cell-val">${e(session.date)||'—'}</div></div>
+        <div class="m"><div class="cell-lbl">Section de police (Galilée)</div><div class="cell-val">${e(trc.section_police)||'—'}</div></div>
+        <div class="m"><div class="cell-lbl">Code Galilée tronçon</div><div class="cell-val">${e(trc.code_galilee)||'—'}</div></div>
+        <div class="m"><div class="cell-lbl">Conditions / Météo</div><div class="cell-val">${e(session.meteo)||'—'}</div></div>
+        <div class="m"><div class="cell-lbl">Feuille n° · Campagne</div><div class="cell-val">${noFeuille}/${total}${session.campagne?' · '+e(session.campagne):''}</div></div>
+      </div>
+    </div>
+    <div class="band">
+      <div class="b"><div class="cell-lbl">N° Tronçon</div><div class="cell-val">${e(trc.num)||'—'}</div></div>
+      <div class="b"><div class="cell-lbl">Regard amont (RA)</div><div class="cell-val">${e(trc.regard_am)||'—'}</div></div>
+      <div class="b"><div class="cell-lbl">Regard aval (RV)</div><div class="cell-val">${e(trc.regard_av)||'—'}</div></div>
+      <div class="b"><div class="cell-lbl">Longueur réelle (m)</div><div class="cell-val">${trc.longueur!=null?trc.longueur:'—'}</div></div>
+      <div class="b"><div class="cell-lbl">Section / dimensions</div><div class="cell-val">${e(section)||'—'}</div></div>
+      <div class="b"><div class="cell-lbl">Matériau</div><div class="cell-val">${e(trc.materiau)||'—'}</div></div>
+      <div class="b"><div class="cell-lbl">Sens d'écoulement</div>
+        <div class="flowbox"><span>Amont</span><span class="ar">▶</span><span>Aval</span><span style="font-weight:400;color:#666;font-size:7pt;"> · ${e(trc.nature)||''}</span></div>
+      </div>
+    </div>
+    <div class="schema">
+      <table>
+        <colgroup><col style="width:26mm"><col span="${COLS}"></colgroup>
+        <tr class="disthead"><th class="rowlbl">D I S T. (m)</th>${distHead}</tr>
+        <tr class="tickrow"><td style="background:#eef3fa;border-bottom:1.4px solid #1b3c77;"></td>${tickRow}</tr>
+        ${schemaRows}
+      </table>
+    </div>
+    <div>
+      <div class="obs-title"><b>OBSERVATIONS &amp; DÉFAUTS CONSTATÉS</b><span>DISTANCE EN MÈTRES DEPUIS REGARD AMONT · CODES SELON NF EN 13508-2</span></div>
+      <div class="obs">
+        <table>
+          <colgroup><col style="width:16mm"><col style="width:26mm"><col><col style="width:28mm"><col style="width:14mm"><col style="width:16mm"></colgroup>
+          <thead><tr>
+            <th>Pos. (m)</th><th>Code NF EN 13508-2</th><th>Description de l'anomalie / observation</th>
+            <th>Zone structurale</th><th>Gravité (1-4)</th><th>Photo n°</th>
+          </tr></thead>
+          <tbody>${obsRows}</tbody>
+        </table>
+      </div>
+    </div>
+    <div class="foot">
+      <div class="sig"><div class="cell-lbl">Signature opérateur</div></div>
+      <div class="sig"><div class="cell-lbl">Visa contrôleur d'équipe (CEC)</div></div>
+      <div class="sig"><div class="cell-lbl">Suite à donner / Remarques</div></div>
+      <div class="deabox"><div class="big">DEA 93</div><small>Direction de l'Eau et de l'Assainissement<br>Bureau d'Exploitation du Réseau</small></div>
+    </div>
+  </div>`;
+  // annexe photos
+  let annex='';
+  if(annexPhotos.length){
+    annex=`<div class="annex"><h2>📷 Annexe photos — Tronçon ${e(trc.num)} · ${e(trc.rue)||''}</h2><div class="grid">`+
+      annexPhotos.map(p=>`<figure><img src="${p.src}" alt=""><figcaption>${e(p.n)} — ${e(p.cap)}</figcaption></figure>`).join('')+
+      `</div></div>`;
+  }
+  return sheet+annex;
+}
+
+function exportFeuille(){
+  if(!session.troncons.length){toast('⚠️ Aucun tronçon');return;}
+  const html=buildFeuilleDoc();
+  let ifr=document.getElementById('fdv-frame');
+  if(ifr)ifr.remove();
+  ifr=document.createElement('iframe');
+  ifr.id='fdv-frame';
+  ifr.style.cssText='position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;';
+  document.body.appendChild(ifr);
+  const doc=ifr.contentWindow.document;
+  doc.open();doc.write(html);doc.close();
+  toast('🖨️ Préparation de la feuille de visite…');
+  setTimeout(()=>{try{ifr.contentWindow.focus();ifr.contentWindow.print();}catch(err){toast('❌ Impression impossible : '+err.message);}},500);
+}
+
+// ── TOAST ──
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
+
+// ── EVENTS ──
+document.getElementById('overlay').addEventListener('click',function(ev){if(ev.target===this)closeModal();});
+document.getElementById('trc-overlay').addEventListener('click',function(ev){if(ev.target===this)closeTrcModal();});
+document.getElementById('lightbox').addEventListener('click',function(ev){if(ev.target===this)closeLightbox();});
+let txS=0;
+document.getElementById('lightbox').addEventListener('touchstart',ev=>{txS=ev.touches[0].clientX;},{passive:true});
+document.getElementById('lightbox').addEventListener('touchend',ev=>{if(Math.abs(ev.changedTouches[0].clientX-txS)>50)lbNav(ev.changedTouches[0].clientX<txS?1:-1);},{passive:true});
+// Empêcher le navigateur d'ouvrir un fichier déposé hors zone
+document.addEventListener('dragover',ev=>ev.preventDefault());
+document.addEventListener('drop',ev=>ev.preventDefault());
+
+const jz=document.getElementById('json-zone');
+jz.addEventListener('dragover',ev=>{ev.preventDefault();ev.stopPropagation();jz.classList.add('over');});
+jz.addEventListener('dragleave',ev=>{if(!jz.contains(ev.relatedTarget))jz.classList.remove('over');});
+jz.addEventListener('drop',ev=>{
+  ev.preventDefault();ev.stopPropagation();jz.classList.remove('over');
+  const f=ev.dataTransfer.files[0];
+  if(f&&(f.name.toLowerCase().endsWith('.json')||f.name.toLowerCase().endsWith('.txt'))){
+    loadJSONSession(ev);
+  }else if(f&&f.name.toLowerCase().endsWith('.pdf')){
+    toast('⚠️ Analysez d\'abord le PDF dans le chat Claude (voir étapes ci-dessus)');
+  }else{
+    toast('⚠️ Fichier .json attendu');
+  }
+});
+</script>
+</body>
+</html>
